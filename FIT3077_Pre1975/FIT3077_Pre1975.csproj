@@ -4,4 +4,11 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Hl7.Fhir.STU3" Version="1.6.0" />
+    <PackageReference Include="Hl7.Fhir.Support" Version="1.6.0" />
+    <PackageReference Include="Hl7.FhirPath" Version="1.6.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
+  </ItemGroup>
+
 </Project>
