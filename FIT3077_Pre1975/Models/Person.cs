@@ -8,14 +8,15 @@ namespace FIT3077_Pre1975.Models
 {
     public enum GenderCode
     {
-        Male,
-        Female,
-        Unknown
+        male,
+        female,
+        other,
+        unknown
     }
 
     public class Person
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string Name { get; set; }
 
@@ -23,7 +24,7 @@ namespace FIT3077_Pre1975.Models
 
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date)]
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
 
         public Address Address { get; set; }
     }

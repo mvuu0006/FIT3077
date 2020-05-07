@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using FIT3077_Pre1975.Models;
+using FIT3077_Pre1975.Services;
 
 namespace FIT3077_Pre1975.Controllers
 {
@@ -27,6 +28,14 @@ namespace FIT3077_Pre1975.Controllers
         {
             return View();
         }
+
+        /*public Action InputId() 
+        {
+            lists = FhirService.GetPatientsOfPractitioner(500);
+
+            
+
+        }*/
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
