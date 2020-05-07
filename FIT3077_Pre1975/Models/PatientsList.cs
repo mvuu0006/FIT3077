@@ -1,4 +1,5 @@
 ﻿using FIT3077_Pre1975.Helpers;
+using FIT3077_Pre1975.Observer;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
-    public class PatientsList : IteratorAggregate
+    public class PatientsList : IteratorAggregate, ISubject
     {
         private List<Patient> _patients;
+        private ArrayList observers = new ArrayList();
 
         public PatientsList() {
             _patients = new List<Patient>();
@@ -42,6 +44,24 @@ namespace FIT3077_Pre1975.Models
         public override IEnumerator GetEnumerator()
         {
             throw new NotImplementedException();
+        }
+
+        public void Attach(IObserver observer)
+        {
+            observers.Add(observer);
+        }
+
+        public void Detach(IObserver observer)
+        {
+            observers.Remove(observer);
+        }
+
+        public void Notify()
+        {
+            foreach (IObserver observer in observers)
+            {
+                observer.Update(this);
+            }
         }
     }
 }
