@@ -37,7 +37,7 @@ namespace FIT3077_Pre1975.Mappings
                 practitioner.BirthDate = null;
             }
 
-            if (Enum.TryParse(element.GenderElement.TypeName, out GenderCode gender))
+            if (Enum.TryParse(element.GenderElement.TypeName, out Gender gender))
             {
                 practitioner.Gender = gender;
             }

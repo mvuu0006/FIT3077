@@ -25,15 +25,12 @@ namespace FIT3077_Pre1975.Controllers
         public ActionResult EnterPractitionerId(string Id)
         {
 
-            Hl7.Fhir.Model.Practitioner fhirPractitioner;
             Practitioner practitioner;
             if (ModelState.IsValid)
             {
-                fhirPractitioner = FhirService.GetPractitioner(Id);
-                if (fhirPractitioner != null)
+                practitioner = FhirService.GetPractitioner(Id);
+                if (practitioner != null)
                 {
-                    PractitionerMapper mapper = new PractitionerMapper();
-                    practitioner = mapper.Map(fhirPractitioner);
                     return View("Detail", practitioner);
                 }
             }

@@ -1,4 +1,6 @@
-﻿using Hl7.Fhir.Model;
+﻿using FIT3077_Pre1975.Mappings;
+using FIT3077_Pre1975.Models;
+using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
 using System;
 using System.Collections.Generic;
@@ -15,19 +17,23 @@ namespace FIT3077_Pre1975.Services
 
         private static readonly FhirClient Client = new FhirClient(SERVICE_ROOT_URL) { Timeout = SERVICE_TIMEOUT };
 
-        public static Practitioner GetPractitioner(string practitionerId)
+        public static Models.Practitioner GetPractitioner(string practitionerId)
         {
-            Practitioner practitioner = null;
+            Models.Practitioner practitioner = null;
+            Hl7.Fhir.Model.Practitioner fhirPractitioner = null;
+
             try
             {
                 var PractitionerQuery = new SearchParams()
                     .Where("identifier=http://hl7.org/fhir/sid/us-npi|" + practitionerId);
 
-                Bundle PractitionerResult = Client.Search<Practitioner>(PractitionerQuery);
+                Bundle PractitionerResult = Client.Search<Hl7.Fhir.Model.Practitioner>(PractitionerQuery);
 
                 if (PractitionerResult.Entry.Count > 0)
                 {
-                    practitioner = (Practitioner)PractitionerResult.Entry[0].Resource;
+                    fhirPractitioner = (Hl7.Fhir.Model.Practitioner)PractitionerResult.Entry[0].Resource;
+                    PractitionerMapper mapper = new PractitionerMapper();
+                    practitioner = mapper.Map(fhirPractitioner);
                 }
             }
             catch (FhirOperationException FhirException)
@@ -41,11 +47,13 @@ namespace FIT3077_Pre1975.Services
             return practitioner;
         }
 
-        public static List<Patient> GetPatientsOfPractitioner(string practitionerId)
+        public static PatientsList GetPatientsOfPractitioner(string practitionerId)
         {
-            List<Patient> patients = new List<Patient>();
+            PatientsList patientList = new PatientsList();
 
             SortedSet<string> patientIdList = new SortedSet<string>();
+
+            Models.Practitioner carer = GetPractitioner(practitionerId);
 
             try
             {
@@ -65,12 +73,15 @@ namespace FIT3077_Pre1975.Services
 
                 foreach (var patientId in patientIdList)
                 {
-                    Bundle PatientResult = Client.SearchById<Patient>(patientId);
+                    Bundle PatientResult = Client.SearchById<Hl7.Fhir.Model.Patient>(patientId);
 
                     if (PatientResult.Entry.Count > 0)
                     {
-                        Patient patient = (Patient)PatientResult.Entry[0].Resource;
-                        patients.Add(patient);
+                        Hl7.Fhir.Model.Patient fhirPatient = (Hl7.Fhir.Model.Patient)PatientResult.Entry[0].Resource;
+                        PatientMapper mapper = new PatientMapper();
+                        Models.Patient patient = mapper.Map(fhirPatient);
+                        patient.Carer = carer;
+                        patientList.AddPatient(patient);
                     }
                 }
             }
@@ -83,7 +94,7 @@ namespace FIT3077_Pre1975.Services
                 System.Diagnostics.Debug.WriteLine("General error message: " + GeneralException.Message);
             }
             
-            return patients;
+            return patientList;
         }
     }
 }
