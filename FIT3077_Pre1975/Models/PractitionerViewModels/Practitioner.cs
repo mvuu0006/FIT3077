@@ -1,4 +1,4 @@
-﻿using FIT3077_Pre1975.Observer;
+﻿using FIT3077_Pre1975.Observers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,10 +6,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FIT3077_Pre1975.Models
+namespace FIT3077_Pre1975.Models.PractitionerViewModels
 {
 
-    public class Practitioner : ISubject
+    public class Practitioner : IObservableSubject
     {
         public string Id { get; set; }
 
@@ -23,21 +23,21 @@ namespace FIT3077_Pre1975.Models
 
         public Address Address { get; set; }
 
-        private ArrayList Observers = new ArrayList();
+        private List<IObserver> _observers = new List<IObserver>();
 
         public void Attach(IObserver observer)
         {
-            Observers.Add(observer);
+            this._observers.Add(observer);
         }
 
         public void Detach(IObserver observer)
         {
-            Observers.Remove(observer);
+            this._observers.Remove(observer);
         }
 
         public void Notify()
         {
-            foreach (IObserver observer in Observers)
+            foreach (var observer in _observers)
             {
                 observer.Update(this);
             }

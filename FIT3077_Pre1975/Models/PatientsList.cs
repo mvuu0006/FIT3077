@@ -1,5 +1,7 @@
 ﻿using FIT3077_Pre1975.Helpers;
-using FIT3077_Pre1975.Observer;
+using FIT3077_Pre1975.Models.PractitionerViewModels;
+using FIT3077_Pre1975.Observers;
+using FIT3077_Pre1975.Services;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
-
-    public class PatientsList : IteratorAggregate, ISubject
+    public class PatientsList : IteratorAggregate, IObserver
     {
         private List<Patient> _patients;
-        private ArrayList observers = new ArrayList();
+
+        private Practitioner _practitioner;
 
         public PatientsList() {
             _patients = new List<Patient>();
@@ -47,21 +49,12 @@ namespace FIT3077_Pre1975.Models
             return new PatientsListIterator(this);
         }
 
-        public void Attach(IObserver observer)
+        public void Update(IObservableSubject subject)
         {
-            observers.Add(observer);
-        }
-
-        public void Detach(IObserver observer)
-        {
-            observers.Remove(observer);
-        }
-
-        public void Notify()
-        {
-            foreach (IObserver observer in observers)
+            if (_practitioner == null || (subject as Practitioner).Id != _practitioner.Id)
             {
-                observer.Update(this);
+                _practitioner = (Practitioner)subject;
+                _patients = FhirService.GetPatientsOfPractitioner(_practitioner.Id);
             }
         }
     }

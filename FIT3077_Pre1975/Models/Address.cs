@@ -19,5 +19,42 @@ namespace FIT3077_Pre1975.Models
 
         public string Country { get; set; }
 
+        public string Text => ToString();
+
+        public override string ToString()
+        {
+            string address = "";
+            
+            foreach (var line in Line)
+            {
+                address += line + " ";
+            }
+
+            if (!String.IsNullOrEmpty(City))
+            {
+                address += City + ", ";
+            }
+
+            if (!String.IsNullOrEmpty(District))
+            {
+                address += District + ", ";
+            }
+
+            if (!String.IsNullOrEmpty(State))
+            {
+                address += State + " ";
+            }
+
+            if (!String.IsNullOrEmpty(PostalCode))
+            {
+                address += PostalCode + ", ";
+            }
+
+            if (!String.IsNullOrEmpty(Country))
+            {
+                address += Country + " ";
+            }
+            return address;
+        }
     }
 }
