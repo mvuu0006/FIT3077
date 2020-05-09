@@ -11,12 +11,11 @@ namespace FIT3077_Pre1975.Models
         private PatientsList _patientsList;
 
         // Stores the current traversal position
-        private int _position;
+        private int _position = -1;
 
         public PatientsListIterator(PatientsList patientsList) 
         {
             _patientsList = patientsList;
-            _position = 0;
         }
 
         public override object Current()

@@ -22,5 +22,6 @@ namespace FIT3077_Pre1975.Models
 
         public Practitioner Carer;
 
+        public List<Observation> Observations { get; set; }
     }
 }

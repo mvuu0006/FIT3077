@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
+
     public class PatientsList : IteratorAggregate, ISubject
     {
         private List<Patient> _patients;
@@ -43,7 +44,7 @@ namespace FIT3077_Pre1975.Models
 
         public override IEnumerator GetEnumerator()
         {
-            throw new NotImplementedException();
+            return new PatientsListIterator(this);
         }
 
         public void Attach(IObserver observer)

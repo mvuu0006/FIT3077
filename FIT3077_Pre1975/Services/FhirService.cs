@@ -96,5 +96,45 @@ namespace FIT3077_Pre1975.Services
             
             return patientList;
         }
+
+        public static PatientsList GetCholesterolValue(PatientsList patients)
+        {
+            PatientsList MonitoredPatientList = new PatientsList();
+
+            foreach (Models.Patient MonitoredPatient in patients)
+            {
+                try
+                {
+
+                    var ObservationQuery = new SearchParams()
+                            .Where("patient=" + MonitoredPatient.Id)
+                            .Where("code=2093-3")
+                            .OrderBy("-date");
+                            
+                    Bundle ObservationResult = Client.Search<Hl7.Fhir.Model.Observation>(ObservationQuery);
+
+                    if (ObservationResult.Entry.Count > 0)
+                    {
+                        Hl7.Fhir.Model.Observation fhirObservation = (Hl7.Fhir.Model.Observation)ObservationResult.Entry[0].Resource;
+                        Models.Patient patient = MonitoredPatient;
+                        ObservationMapper mapper = new ObservationMapper();
+                        Models.Observation cholesterolObservation = mapper.Map(fhirObservation);
+                        cholesterolObservation.Subject = MonitoredPatient;
+                        patient.Observations = new List<Models.Observation>();
+                        patient.Observations.Add(cholesterolObservation);
+                        MonitoredPatientList.AddPatient(patient);
+                    }
+                }
+                catch (FhirOperationException FhirException)
+                {
+                    System.Diagnostics.Debug.WriteLine("Fhir error message: " + FhirException.Message);
+                }
+                catch (Exception GeneralException)
+                {
+                    System.Diagnostics.Debug.WriteLine("General error message: " + GeneralException.Message);
+                }
+            }
+            return MonitoredPatientList;
+        }
     }
 }
