@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FIT3077_Pre1975.Mappings;
 using FIT3077_Pre1975.Models;
-using FIT3077_Pre1975.Models.PractitionerViewModels;
 using FIT3077_Pre1975.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -38,7 +37,7 @@ namespace FIT3077_Pre1975.Controllers
         // POST: /Practitioner/Login
         //
         [HttpPost]
-        public ActionResult Login(LoginViewModel model)
+        public async Task<ActionResult> LoginAsync(LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -46,7 +45,7 @@ namespace FIT3077_Pre1975.Controllers
             }
 
             Practitioner newPractininer;
-            newPractininer = FhirService.GetPractitioner(model.Id);
+            newPractininer = await FhirService.GetPractitioner(model.Id);
             if (newPractininer != null)
             {
                 Practitioner = newPractininer;

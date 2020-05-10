@@ -1,4 +1,4 @@
-﻿using FIT3077_Pre1975.Models.PractitionerViewModels;
+﻿using FIT3077_Pre1975.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

@@ -17,9 +17,9 @@ namespace FIT3077_Pre1975.Services
 
         private static readonly FhirClient Client = new FhirClient(SERVICE_ROOT_URL) { Timeout = SERVICE_TIMEOUT };
 
-        public static Models.PractitionerViewModels.Practitioner GetPractitioner(string practitionerId)
+        public static async Task<Models.Practitioner> GetPractitioner(string practitionerId)
         {
-            Models.PractitionerViewModels.Practitioner practitioner = null;
+            Models.Practitioner practitioner = null;
             Hl7.Fhir.Model.Practitioner fhirPractitioner = null;
 
             try
@@ -27,7 +27,7 @@ namespace FIT3077_Pre1975.Services
                 var PractitionerQuery = new SearchParams()
                     .Where("identifier=http://hl7.org/fhir/sid/us-npi|" + practitionerId);
 
-                Bundle PractitionerResult = Client.Search<Hl7.Fhir.Model.Practitioner>(PractitionerQuery);
+                Bundle PractitionerResult = await Client.SearchAsync<Hl7.Fhir.Model.Practitioner>(PractitionerQuery);
 
                 if (PractitionerResult.Entry.Count > 0)
                 {
@@ -47,13 +47,13 @@ namespace FIT3077_Pre1975.Services
             return practitioner;
         }
 
-        public static List<Models.Patient> GetPatientsOfPractitioner(string practitionerId)
+        public static async Task<List<Models.Patient>> GetPatientsOfPractitioner(string practitionerId)
         {
             List<Models.Patient> patientList = new List<Models.Patient>();
 
             SortedSet<string> patientIdList = new SortedSet<string>();
 
-            Models.PractitionerViewModels.Practitioner carer = GetPractitioner(practitionerId);
+            Models.Practitioner carer = await GetPractitioner(practitionerId);
 
             try
             {
@@ -61,7 +61,7 @@ namespace FIT3077_Pre1975.Services
                     .Where("participant.identifier=http://hl7.org/fhir/sid/us-npi|" + practitionerId)
                     .Include("Encounter.participant.individual")
                     .Include("Encounter.patient");
-                Bundle Result = Client.Search<Encounter>(encounterQuery);
+                Bundle Result = await Client.SearchAsync<Encounter>(encounterQuery);
 
                 foreach (var Entry in Result.Entry)
                 {
@@ -73,7 +73,7 @@ namespace FIT3077_Pre1975.Services
 
                 foreach (var patientId in patientIdList)
                 {
-                    Bundle PatientResult = Client.SearchById<Hl7.Fhir.Model.Patient>(patientId);
+                    Bundle PatientResult = await Client.SearchByIdAsync<Hl7.Fhir.Model.Patient>(patientId);
 
                     if (PatientResult.Entry.Count > 0)
                     {
@@ -97,7 +97,7 @@ namespace FIT3077_Pre1975.Services
             return patientList;
         }
 
-        public static PatientsList GetCholesterolValue(PatientsList patients)
+        public static async Task<PatientsList> GetCholesterolValues(PatientsList patients)
         {
             PatientsList MonitoredPatientList = new PatientsList();
 
@@ -111,7 +111,7 @@ namespace FIT3077_Pre1975.Services
                             .Where("code=2093-3")
                             .OrderBy("-date");
                             
-                    Bundle ObservationResult = Client.Search<Hl7.Fhir.Model.Observation>(ObservationQuery);
+                    Bundle ObservationResult = await Client.SearchAsync<Hl7.Fhir.Model.Observation>(ObservationQuery);
 
                     if (ObservationResult.Entry.Count > 0)
                     {
@@ -120,8 +120,10 @@ namespace FIT3077_Pre1975.Services
                         ObservationMapper mapper = new ObservationMapper();
                         Models.Observation cholesterolObservation = mapper.Map(fhirObservation);
                         cholesterolObservation.Subject = MonitoredPatient;
-                        patient.Observations = new List<Models.Observation>();
-                        patient.Observations.Add(cholesterolObservation);
+                        patient.Observations = new List<Models.Observation>
+                        {
+                            cholesterolObservation
+                        };
                         MonitoredPatientList.AddPatient(patient);
                     }
                 }

@@ -10,5 +10,7 @@ namespace FIT3077_Pre1975.Observers
     {
         // Receive update from model
         void Update(IObservableSubject subject);
+
+        Task UpdateAsync(IObservableSubject subject);
     }
 }   
