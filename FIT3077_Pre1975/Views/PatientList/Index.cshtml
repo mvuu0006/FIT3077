@@ -3,32 +3,57 @@
 @{
     ViewData["Title"] = "View";
 }
-    <div>
-        <h4>Patients List</h4>
-        </hr>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">ID</th>
-                    <th scope="col">Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model != null && Model.Count > 0)
-                {
-                    int count = 1;
-                    foreach (Patient patient in Model)
-                    {
-                        // Create the list of these clients
-                        <tr>
-                            <td>@count</td>
-                            <td>@patient.Id</td>
-                            <td>@patient.Name</td>
-                        </tr>
-                        count++;
-                    }
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js" type="text/javascript"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#table123 input").click(function () {
+                if ($(this).is(":checked")) {
+                    $(this).parent().parent().addClass("highlight");
+                } else {
+                    $(this).parent().parent().removeClass("highlight");
                 }
-            </tbody>
-        </table>
-    </div>
+            });
+        });
+    </script>
+<div>
+    <h4>Patients List</h4>
+    <table class="table" id="table123">
+        <thead>
+            <tr>
+                <th scope="col"><input type="checkbox" id="disabled" disabled="disabled"></th>
+                <th scope="col">#</th>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                int count = 1;
+                foreach (Patient patient in Model)
+                {
+                    // Create the list of these clients
+
+                    <tr>
+                        <td><input type="checkbox" id="patient" +"@count"></td>
+                        <td>@count</td>
+                        <td>@patient.Id</td>
+                        <td>@patient.Name</td>
+                    </tr>
+                    count++;
+                }
+            }
+        </tbody>
+    </table>
+</div>
+<div><button type="button" id="submit" onclick="location.href='@Url.Action("MonitoredList", "MonitoredPatient")'">Update Monitored Patients</button></div>
+<style>
+    .highlight {
+        color: #fff;
+        background-color: #1b6ec2;
+        border-color: #1861ac;
+    }
+</style>
+
+
