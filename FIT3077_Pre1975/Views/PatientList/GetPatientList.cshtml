@@ -4,7 +4,25 @@
 
 <script>
     $(document).ready(function () {
-        $("#table123 input").click(function () {
+        $(function () {
+            $('th > :checkbox').click(function () {
+                if ($(this).is(":checked")) {
+                    $(this).closest('table')
+                        .find('td > :checkbox')
+                        .attr('checked', $(this).is(':checked'))
+                        .prop('checked', $(this).is(':checked'))
+                        .parent().parent().addClass("highlight");
+                } else {
+                    $(this).closest('table')
+                        .find('td > :checkbox')
+                        .attr('checked', $(this).is(':checked'))
+                        .prop('checked', $(this).is(':checked'))
+                        .parent().parent().removeClass("highlight");
+                }
+                $(this).parent().parent().removeClass("highlight");
+            });
+        });
+        $("#mytable input").click(function () {
             var Id = parseInt($(this).attr('id'));
             if ($(this).is(":checked")) {
                 $(this).parent().parent().addClass("highlight");
@@ -13,6 +31,7 @@
                 var Id = $(this).attr('id');
             }
         });
+        
     });
 </script>
 
@@ -21,7 +40,7 @@
         $("#btnUpdate").click(function () {
             var IdList = [];
 
-            $("#table123 input[type=checkbox]:checked").each(function () {
+            $("#mytable input[type=checkbox]:checked").each(function () {
                 var row = $(this).closest("tr")[0];
                 IdList.push(row.cells[2].innerHTML);
             });
@@ -39,10 +58,10 @@
     });
 </script>
 
-<table class="table" id="table123">
+<table class="table" id="mytable">
     <thead>
         <tr>
-            <th scope="col"><input type="checkbox" id="disabled" disabled="disabled"></th>
+            <th scope="col"><input type="checkbox" id="checkall"></th>
             <th scope="col">#</th>
             <th scope="col">ID</th>
             <th scope="col">Name</th>
