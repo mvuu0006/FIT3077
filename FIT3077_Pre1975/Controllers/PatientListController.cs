@@ -87,5 +87,10 @@ namespace FIT3077_Pre1975.Controllers
 
             return View("Monitor");
         }
+
+        public  ActionResult ShowDetail(string Id)
+        {
+            return PartialView("PatientDetail", AppContext.Patients.GetPatientByID(Id));    
+        }
     }
 }

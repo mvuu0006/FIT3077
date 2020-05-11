@@ -30,11 +30,11 @@ namespace FIT3077_Pre1975.Controllers
                 return View(model);
             }
 
-            Practitioner newPractininer;
-            newPractininer = await FhirService.GetPractitioner(model.Id);
-            if (newPractininer != null)
+            Practitioner newPractitioner;
+            newPractitioner = await FhirService.GetPractitioner(model.Id);
+            if (newPractitioner != null)
             {
-                AppContext.Practitioner = newPractininer;
+                AppContext.Practitioner = newPractitioner;
                 AppContext.Practitioner.Notify();
                 return Redirect("/Practitioner/");
             }
