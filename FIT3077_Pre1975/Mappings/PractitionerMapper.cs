@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Mappings
 {
-    public sealed class PractitionerMapper : MapperBase<FIT3077_Pre1975.Models.PractitionerViewModels.Practitioner, Hl7.Fhir.Model.Practitioner>
+    public sealed class PractitionerMapper : MapperBase<FIT3077_Pre1975.Models.Practitioner, Hl7.Fhir.Model.Practitioner>
     {
 
         private const string ID_SYSTEM = "http://hl7.org/fhir/sid/us-npi";
 
-        public override Models.PractitionerViewModels.Practitioner Map(Hl7.Fhir.Model.Practitioner element)
+        public override Models.Practitioner Map(Hl7.Fhir.Model.Practitioner element)
         {
-            var practitioner = new Models.PractitionerViewModels.Practitioner();
+            var practitioner = new Models.Practitioner();
             
             foreach (var identifier in element.Identifier)
             {
@@ -52,7 +52,7 @@ namespace FIT3077_Pre1975.Mappings
             return practitioner;
         }
 
-        public override Hl7.Fhir.Model.Practitioner Map(Models.PractitionerViewModels.Practitioner element)
+        public override Hl7.Fhir.Model.Practitioner Map(Models.Practitioner element)
         {
             throw new NotImplementedException();
         }

@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FIT3077_Pre1975.Models.PractitionerViewModels
+namespace FIT3077_Pre1975.Models
 {
 
     public class Practitioner : IObservableSubject
@@ -39,7 +39,7 @@ namespace FIT3077_Pre1975.Models.PractitionerViewModels
         {
             foreach (var observer in _observers)
             {
-                observer.Update(this);
+                observer.UpdateAsync(this);
             }
         }
     }
