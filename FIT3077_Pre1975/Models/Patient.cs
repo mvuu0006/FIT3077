@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
@@ -24,5 +25,7 @@ namespace FIT3077_Pre1975.Models
         public Practitioner Carer;
 
         public List<Observation> Observations { get; set; }
+
+        public bool HasObservations { get; set; } = false;
     }
 }

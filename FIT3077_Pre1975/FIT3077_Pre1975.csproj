@@ -5,6 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Scripts\**" />
+    <Content Remove="Scripts\**" />
+    <EmbeddedResource Remove="Scripts\**" />
+    <None Remove="Scripts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Effort.EF6" Version="2.2.10" />
     <PackageReference Include="Hl7.Fhir.R4" Version="1.7.0" />
     <PackageReference Include="Hl7.Fhir.Support" Version="1.7.0" />
     <PackageReference Include="Hl7.FhirPath" Version="1.7.0" />

@@ -13,20 +13,6 @@ namespace FIT3077_Pre1975.Controllers
     public class PractitionerController : Controller
     {
 
-        private static Practitioner _practitioner;
-
-        internal static Practitioner Practitioner { 
-            get
-            {
-                return _practitioner;
-            }
-            set
-            {
-                _practitioner = value;
-                _practitioner.Attach(PatientListController.Patients);
-            }
-        }
-
         // GET: /Practitioner/Login
         //
         public IActionResult Login()
@@ -48,8 +34,8 @@ namespace FIT3077_Pre1975.Controllers
             newPractininer = await FhirService.GetPractitioner(model.Id);
             if (newPractininer != null)
             {
-                Practitioner = newPractininer;
-                Practitioner.Notify();
+                AppContext.Practitioner = newPractininer;
+                AppContext.Practitioner.Notify();
                 return Redirect("/Practitioner/");
             }
             else
@@ -63,11 +49,11 @@ namespace FIT3077_Pre1975.Controllers
         //
         public IActionResult Index()
         {
-            if (Practitioner == null)
+            if (AppContext.Practitioner == null)
             {
                 return Redirect("/Practitioner/Login/");
             }
-            return View(Practitioner); 
+            return View(AppContext.Practitioner); 
         }
 
     }

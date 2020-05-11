@@ -16,7 +16,7 @@ namespace FIT3077_Pre1975.Models
 
         private Practitioner _practitioner;
 
-        public bool IsLoading { get; set; } = true;
+        public bool IsLoading { get; set; } = false;
 
         public PatientsList() {
             _patients = new List<Patient>();

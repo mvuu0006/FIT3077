@@ -109,7 +109,8 @@ namespace FIT3077_Pre1975.Services
                     var ObservationQuery = new SearchParams()
                             .Where("patient=" + MonitoredPatient.Id)
                             .Where("code=2093-3")
-                            .OrderBy("-date");
+                            .OrderBy("-date")
+                            .LimitTo(1);
                             
                     Bundle ObservationResult = await Client.SearchAsync<Hl7.Fhir.Model.Observation>(ObservationQuery);
 
@@ -124,6 +125,7 @@ namespace FIT3077_Pre1975.Services
                         {
                             cholesterolObservation
                         };
+                        patient.HasObservations = true;
                         MonitoredPatientList.AddPatient(patient);
                     }
                 }

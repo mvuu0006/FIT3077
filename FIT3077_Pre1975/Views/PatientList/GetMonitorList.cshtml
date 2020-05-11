@@ -1,0 +1,29 @@
+﻿@model FIT3077_Pre1975.Models.PatientsList
+
+<table class="table" id="table123">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            int count = 1;
+            foreach (Patient patient in Model)
+            {
+                // Create the list of these clients
+
+                <tr>
+                    <td>@count</td>
+                    <td>@patient.Id</td>
+                    <td>@patient.Name</td>
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+</table>

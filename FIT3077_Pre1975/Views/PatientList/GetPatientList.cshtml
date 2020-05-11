@@ -1,8 +1,48 @@
 ﻿@model FIT3077_Pre1975.Models.PatientsList
 
-<table class="table">
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js" type="text/javascript"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#table123 input").click(function () {
+            var Id = parseInt($(this).attr('id'));
+            if ($(this).is(":checked")) {
+                $(this).parent().parent().addClass("highlight");
+            } else {
+                $(this).parent().parent().removeClass("highlight");
+                var Id = $(this).attr('id');
+            }
+        });
+    });
+</script>
+
+<script>
+    $(function () {
+        $("#btnUpdate").click(function () {
+            var IdList = [];
+
+            $("#table123 input[type=checkbox]:checked").each(function () {
+                var row = $(this).closest("tr")[0];
+                IdList.push(row.cells[2].innerHTML);
+            });
+
+            $.ajax({
+                url: '@Url.Action("UpdateMonitor", "PatientList")',
+                data: { ListId: IdList },
+                dataType: "json",
+                type: 'POST',
+                traditional: true,
+            });
+
+            return false;
+        });
+    });
+</script>
+
+<table class="table" id="table123">
     <thead>
         <tr>
+            <th scope="col"><input type="checkbox" id="disabled" disabled="disabled"></th>
             <th scope="col">#</th>
             <th scope="col">ID</th>
             <th scope="col">Name</th>
@@ -16,6 +56,7 @@
             {
                 // Create the list of these clients
                 <tr>
+                    <td><input type="checkbox" id="patient" +"@count"></td>
                     <td>@count</td>
                     <td>@patient.Id</td>
                     <td>@patient.Name</td>
@@ -25,3 +66,12 @@
         }
     </tbody>
 </table>
+<div><button type="button" id="btnUpdate" class="btn btn-primary">Update Monitored Patients</button></div>
+
+<style>
+    .highlight {
+        color: #fff;
+        background-color: #1b6ec2;
+        border-color: #1861ac;
+    }
+</style>
