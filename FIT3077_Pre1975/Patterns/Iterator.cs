@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FIT3077_Pre1975.Helpers
+namespace FIT3077_Pre1975.Patterns
 {
     public abstract class Iterator : IEnumerator
     {

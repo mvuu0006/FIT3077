@@ -4,13 +4,19 @@
 
 <script>
     $(document).ready(function () {
+        $("#table123 input[type=checkbox]:checked").each(function () {
+            $(this).parent().parent().addClass("highlight");
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
         $("#table123 input").click(function () {
-            var Id = parseInt($(this).attr('id'));
             if ($(this).is(":checked")) {
                 $(this).parent().parent().addClass("highlight");
             } else {
                 $(this).parent().parent().removeClass("highlight");
-                var Id = $(this).attr('id');
             }
         });
     });
@@ -20,7 +26,6 @@
     $(function () {
         $("#btnUpdate").click(function () {
             var IdList = [];
-
             $("#table123 input[type=checkbox]:checked").each(function () {
                 var row = $(this).closest("tr")[0];
                 IdList.push(row.cells[2].innerHTML);
@@ -31,13 +36,20 @@
                 data: { ListId: IdList },
                 dataType: "json",
                 type: 'POST',
-                traditional: true,
+                traditional: true
             });
+
+            $(".alert").show();
 
             return false;
         });
     });
 </script>
+
+<div class="alert alert-success alert-dismissible">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Success!</strong> Monitor List is updated.
+</div>
 
 <table class="table" id="table123">
     <thead>
@@ -56,7 +68,7 @@
             {
                 // Create the list of these clients
                 <tr>
-                    <td><input type="checkbox" id="patient" +"@count"></td>
+                    <td><input type="checkbox" id="patient" +"@count" checked=@patient.Selected></td>
                     <td>@count</td>
                     <td>@patient.Id</td>
                     <td>@patient.Name</td>
@@ -73,5 +85,8 @@
         color: #fff;
         background-color: #1b6ec2;
         border-color: #1861ac;
+    }
+    .alert {
+        display: none;
     }
 </style>

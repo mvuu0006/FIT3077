@@ -27,5 +27,31 @@ namespace FIT3077_Pre1975.Models
         public List<Observation> Observations { get; set; }
 
         public bool HasObservations { get; set; } = false;
+
+        public bool Selected { get; set; } = false;
+
+        public bool ContainsObservation(string Text)
+        {
+            foreach (Observation observation in Observations)
+            {
+                if (observation.CodeText.Equals(Text))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public Observation GetObservationByCodeText(string Text)
+        {
+            foreach (Observation observation in Observations)
+            {
+                if (observation.CodeText.Equals(Text))
+                {
+                    return observation;
+                }
+            }
+            return null;
+        }
     }
 }

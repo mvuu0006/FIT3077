@@ -67,6 +67,7 @@ namespace FIT3077_Pre1975.Controllers
             {
                 if (ListId.Contains(patient.Id))
                 {
+                    patient.Selected = true;
                     if (!patient.HasObservations)
                     {
                         queryPatients.AddPatient(patient);
@@ -75,6 +76,10 @@ namespace FIT3077_Pre1975.Controllers
                     {
                         newMonitorList.AddPatient(patient);
                     }
+                } 
+                else
+                {
+                    patient.Selected = false;
                 }
             }
             PatientsList queriedPatients = await FhirService.GetCholesterolValues(queryPatients);

@@ -15,6 +15,8 @@ namespace FIT3077_Pre1975.Services
 
         private const int SERVICE_TIMEOUT = 60 * 1000;
 
+        private const int LIMIT_ENTRY = 10000;
+
         private static readonly FhirClient Client = new FhirClient(SERVICE_ROOT_URL) { Timeout = SERVICE_TIMEOUT };
 
         public static async Task<Models.Practitioner> GetPractitioner(string practitionerId)
@@ -25,7 +27,8 @@ namespace FIT3077_Pre1975.Services
             try
             {
                 var PractitionerQuery = new SearchParams()
-                    .Where("identifier=http://hl7.org/fhir/sid/us-npi|" + practitionerId);
+                    .Where("identifier=http://hl7.org/fhir/sid/us-npi|" + practitionerId)
+                    .LimitTo(LIMIT_ENTRY);
 
                 Bundle PractitionerResult = await Client.SearchAsync<Hl7.Fhir.Model.Practitioner>(PractitionerQuery);
 
@@ -60,7 +63,8 @@ namespace FIT3077_Pre1975.Services
                 var encounterQuery = new SearchParams()
                     .Where("participant.identifier=http://hl7.org/fhir/sid/us-npi|" + practitionerId)
                     .Include("Encounter.participant.individual")
-                    .Include("Encounter.patient");
+                    .Include("Encounter.patient")
+                    .LimitTo(LIMIT_ENTRY);
                 Bundle Result = await Client.SearchAsync<Encounter>(encounterQuery);
 
                 foreach (var Entry in Result.Entry)
@@ -93,7 +97,7 @@ namespace FIT3077_Pre1975.Services
             {
                 System.Diagnostics.Debug.WriteLine("General error message: " + GeneralException.Message);
             }
-            
+
             return patientList;
         }
 
@@ -111,23 +115,23 @@ namespace FIT3077_Pre1975.Services
                             .Where("code=2093-3")
                             .OrderBy("-date")
                             .LimitTo(1);
-                            
+
                     Bundle ObservationResult = await Client.SearchAsync<Hl7.Fhir.Model.Observation>(ObservationQuery);
+
+                    Models.Patient patient = MonitoredPatient;
+                    patient.Observations = new List<Models.Observation>();
+                    patient.HasObservations = true;
 
                     if (ObservationResult.Entry.Count > 0)
                     {
                         Hl7.Fhir.Model.Observation fhirObservation = (Hl7.Fhir.Model.Observation)ObservationResult.Entry[0].Resource;
-                        Models.Patient patient = MonitoredPatient;
                         ObservationMapper mapper = new ObservationMapper();
                         Models.Observation cholesterolObservation = mapper.Map(fhirObservation);
-                        cholesterolObservation.Subject = MonitoredPatient;
-                        patient.Observations = new List<Models.Observation>
-                        {
-                            cholesterolObservation
-                        };
-                        patient.HasObservations = true;
-                        MonitoredPatientList.AddPatient(patient);
+                        cholesterolObservation.Subject = patient;
+                        patient.Observations.Add(cholesterolObservation);
+
                     }
+                    MonitoredPatientList.AddPatient(patient);
                 }
                 catch (FhirOperationException FhirException)
                 {
@@ -139,6 +143,47 @@ namespace FIT3077_Pre1975.Services
                 }
             }
             return MonitoredPatientList;
+        }
+
+        public static async Task<Models.Patient> GetDataForAnalysis(Models.Patient patient)
+        {
+            Models.Patient currentPatient = patient;
+            currentPatient.Observations = new List<Models.Observation>();
+            currentPatient.HasObservations = true;
+            try
+            {
+                var ObservationQuery = new SearchParams()
+                        .Where("patient=" + patient.Id)
+                        .OrderBy("-date")
+                        .LimitTo(LIMIT_ENTRY);
+
+                Bundle ObservationResult = await Client.SearchAsync<Hl7.Fhir.Model.Observation>(ObservationQuery);
+
+                foreach (var Entry in ObservationResult.Entry)
+                {
+                    Hl7.Fhir.Model.Observation fhirObservation = (Hl7.Fhir.Model.Observation)Entry.Resource;
+                    if (fhirObservation.Value != null && fhirObservation.Value is Hl7.Fhir.Model.Quantity)
+                    {
+                        ObservationMapper mapper = new ObservationMapper();
+                        Models.Observation observation = mapper.Map(fhirObservation);
+                        if (!currentPatient.ContainsObservation(observation.CodeText))
+                        {
+                            observation.Subject = currentPatient;
+                            currentPatient.Observations.Add(observation);
+                        }
+                    }
+                }
+            }
+            catch (FhirOperationException FhirException)
+            {
+                System.Diagnostics.Debug.WriteLine("Fhir error message: " + FhirException.Message);
+            }
+            catch (Exception GeneralException)
+            {
+                System.Diagnostics.Debug.WriteLine("General error message: " + GeneralException.Message);
+            }
+
+            return currentPatient;
         }
     }
 }
