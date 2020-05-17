@@ -44,17 +44,12 @@ namespace FIT3077_Pre1975.Controllers
             }
             else
             {
+                while (AppContext.MonitorPatients.IsLoading == true)
+                {
+                    Thread.Sleep(500);
+                }
                 return View(AppContext.MonitorPatients);
             }
-        }
-
-        public ActionResult GetMonitorList()
-        {
-            while (AppContext.MonitorPatients.IsLoading == true)
-            {
-                Thread.Sleep(500);
-            }
-            return PartialView(AppContext.MonitorPatients);
         }
 
         [HttpPost]
@@ -91,6 +86,11 @@ namespace FIT3077_Pre1975.Controllers
             AppContext.MonitorPatients = newMonitorList;
 
             return View("Monitor");
+        }
+
+        public ActionResult ShowDetail(string Id)
+        {
+            return PartialView("PatientDetail", AppContext.MonitorPatients.GetPatientByID(Id));
         }
     }
 }

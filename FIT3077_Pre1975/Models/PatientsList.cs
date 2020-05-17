@@ -60,6 +60,16 @@ namespace FIT3077_Pre1975.Models
             }
         }
 
+        public Patient GetPatientByID(string ID) {
+            foreach (Patient patient in _patients) { 
+                if (patient.Id == ID)
+                {
+                    return patient;
+                }
+            }
+            return null;
+        }
+
         public override IEnumerator GetEnumerator()
         {
             return new PatientsListIterator(this);

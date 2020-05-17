@@ -13,12 +13,32 @@
 <script>
     $(document).ready(function () {
         $("#table123 input").click(function () {
+            $('th > :checkbox').click(function () {
+                if ($(this).is(":checked")) {
+                    $(this).closest('table')
+                        .find('td > :checkbox')
+                        .attr('checked', $(this).is(':checked'))
+                        .prop('checked', $(this).is(':checked'))
+                        .parent().parent().addClass("highlight");
+                } else {
+                    $(this).closest('table')
+                        .find('td > :checkbox')
+                        .attr('checked', $(this).is(':checked'))
+                        .prop('checked', $(this).is(':checked'))
+                        .parent().parent().removeClass("highlight");
+                }
+                $(this).parent().parent().removeClass("highlight");
+            });
+        });
+
+        $("#table123 input").click(function () {
             if ($(this).is(":checked")) {
                 $(this).parent().parent().addClass("highlight");
             } else {
                 $(this).parent().parent().removeClass("highlight");
             }
         });
+        
     });
 </script>
 
@@ -54,7 +74,7 @@
 <table class="table" id="table123">
     <thead>
         <tr>
-            <th scope="col"><input type="checkbox" id="disabled" disabled="disabled"></th>
+            <th scope="col"><input type="checkbox" id="checkall"></th>
             <th scope="col">#</th>
             <th scope="col">ID</th>
             <th scope="col">Name</th>
