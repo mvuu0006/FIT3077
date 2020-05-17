@@ -26,13 +26,16 @@
             @Html.DisplayFor(model => model.Gender)
         </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.BirthDate)
-        </dt>
+        @if (Model != null && Model.BirthDate != null)
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.BirthDate)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.BirthDate)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.BirthDate)
+            </dd>
+        }
 
         @if (Model != null && Model.Address != null)
         {
