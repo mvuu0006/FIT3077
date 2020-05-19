@@ -73,6 +73,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">Total Cholesterol</th>
                 <th scope="col">Time</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -82,23 +83,26 @@
                 foreach (Patient patient in Model)
                 {
 
-                    <tr id=@patient.Id>
-                        <td>@patient.Id</td>
-                        <td>@patient.Name</td>
-                        @if (patient.Observations.Count == 0)
-                        {
-                            <td>No Data</td>
-                            <td>No Data</td>
-                        }
-                        else
-                        {
-                            <td class="patientvalue">@patient.Observations[0].MeasurementResult.Value @patient.Observations[0].MeasurementResult.Unit</td>
-                            <td>@patient.Observations[0].Issued</td>
-                        }
-                        <td>
-                            <a href="javascript:void(0);" class="anchorDetail" data-id="@patient.Id">Details</a>
-                        </td>
-                    </tr>
+            <tr id=@patient.Id>
+                <td>@patient.Id</td>
+                <td>@patient.Name</td>
+                @if (patient.Observations.Count == 0)
+                {
+                    <td>No Data</td>
+                    <td>No Data</td>
+                }
+                else
+                {
+                    <td class="patientvalue">@patient.Observations[0].MeasurementResult.Value @patient.Observations[0].MeasurementResult.Unit</td>
+                    <td>@patient.Observations[0].Issued</td>
+                }
+                <td>
+                    <a href="javascript:void(0);" class="anchorDetail" data-id="@patient.Id">Details</a>
+                </td>
+                <td>
+                    <button type="button" class="delete" data-id="@patient.Id">Remove</button>
+                </td>
+            </tr>
 
                     count++;
                 }
@@ -151,7 +155,6 @@
             type: 'POST',
             traditional: true,
         });
-
         //alert("UPDATED");
         ;
 
@@ -211,3 +214,19 @@
 
 <p style="position:relative; top:20px" id="demo"></p>
 
+<script>
+    $(".delete").on("click", function () {
+    if (confirm("Do you want to remove this patient ?")) {
+        var id = $(this).attr('data-id');
+        var tr = $(this).closest('tr');
+        tr.remove();
+        $.ajax({
+            url: '@Url.Action("RemoveMonitorPatient", "PatientList")',
+            data: { Id: id },
+            dataType: "json",
+            type: 'POST',
+            traditional: true,
+        });
+    }
+    });
+</script>

@@ -99,6 +99,13 @@ namespace FIT3077_Pre1975.Controllers
         {
             return PartialView("PatientDetail", AppContext.MonitorPatients.GetPatientByID(Id));
         }
+
+        public EmptyResult RemoveMonitorPatient(string Id)
+        {
+            AppContext.MonitorPatients.GetPatientByID(Id).Selected = false;
+            AppContext.MonitorPatients.RemovePatientByID(Id);
+            return new EmptyResult();
+        }
     } 
 }
 
