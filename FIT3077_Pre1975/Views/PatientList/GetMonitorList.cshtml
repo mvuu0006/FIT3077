@@ -1,6 +1,5 @@
 ﻿@model FIT3077_Pre1975.Models.PatientsList
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js" type="text/javascript"></script>
-
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.2.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
@@ -8,7 +7,7 @@
     var TeamDetailPostBackURL = 'ShowDetail';
     $(function () {
         $(".anchorDetail").click(function () {
-                       
+
             var $buttonClicked = $(this);
             var id = $buttonClicked.attr('data-id');
             var options = { "backdrop": "static", keyboard: true };
@@ -19,7 +18,7 @@
                 data: { "Id": id },
                 datatype: "json",
                 success: function (data) {
-                    
+
                     $('#myModalContent').html(data);
                     $('#myModal').modal(options);
                     $('#myModal').modal('show');
@@ -36,7 +35,7 @@
         });
     });
 
-    </script>
+</script>
 
 
 <script>
@@ -105,11 +104,40 @@
 
 </div>
 
-
-
 <style>
     .highlight {
         color: red;
         border-color: #1861ac;
     }
 </style>
+
+<script type="text/javascript">
+    var interval = 10000;
+    setInterval(function () { Update() }, interval);
+
+    function Update() {
+        var IdList = [];
+
+        $('td').each(function () {
+            if ($(this).hasClass('anchorDetail')) {
+                IdList.push($(this).attr('data-id'));
+            }
+        });
+
+        $.ajax({
+            url: '@Url.Action("ResetMonitorList", "PatientList")',
+            data: { ListId: IdList },
+            dataType: "json",
+            type: 'POST',
+            traditional: true,
+        });
+
+        alert("UPDATED");
+    ;
+    }
+
+</script>
+
+<div>
+
+</div>

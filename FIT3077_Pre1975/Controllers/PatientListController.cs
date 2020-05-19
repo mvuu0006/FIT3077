@@ -88,9 +88,22 @@ namespace FIT3077_Pre1975.Controllers
             return View("Monitor");
         }
 
+        public async Task<ActionResult> ResetMonitorList(List<string> ListId)
+        {
+            PatientsList queriedPatients = await FhirService.GetCholesterolValues(AppContext.MonitorPatients);
+            AppContext.MonitorPatients = queriedPatients;
+            return View("Monitor");
+        }
+
         public  ActionResult ShowDetail(string Id)
         {
             return PartialView("PatientDetail", AppContext.Patients.GetPatientByID(Id));    
+        }
+
+        public ActionResult UpdateMessage()
+        {
+            TempData["alertMessage"] = "Reload Successful";
+            return View();
         }
     }
 }
