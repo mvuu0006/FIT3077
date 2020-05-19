@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FIT3077_Pre1975.Models;
 using FIT3077_Pre1975.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FIT3077_Pre1975.Controllers
 {
@@ -24,14 +23,14 @@ namespace FIT3077_Pre1975.Controllers
             {
                 return View();
             }
-            
+
         }
 
         public ActionResult GetPatientList()
         {
             while (AppContext.Patients.IsLoading == true)
             {
-                Thread.Sleep(500); 
+                Thread.Sleep(500);
             }
             return PartialView(AppContext.Patients);
         }
@@ -44,17 +43,12 @@ namespace FIT3077_Pre1975.Controllers
             }
             else
             {
+                while (AppContext.MonitorPatients.IsLoading == true)
+                {
+                    Thread.Sleep(500);
+                }
                 return View(AppContext.MonitorPatients);
             }
-        }
-
-        public ActionResult GetMonitorList()
-        {
-            while (AppContext.MonitorPatients.IsLoading == true)
-            {
-                Thread.Sleep(500);
-            }
-            return PartialView(AppContext.MonitorPatients);
         }
 
         [HttpPost]
@@ -67,6 +61,7 @@ namespace FIT3077_Pre1975.Controllers
             {
                 if (ListId.Contains(patient.Id))
                 {
+                    patient.Selected = true;
                     if (!patient.HasObservations)
                     {
                         queryPatients.AddPatient(patient);
@@ -76,6 +71,10 @@ namespace FIT3077_Pre1975.Controllers
                         newMonitorList.AddPatient(patient);
                     }
                 }
+                else
+                {
+                    patient.Selected = false;
+                }
             }
             PatientsList queriedPatients = await FhirService.GetCholesterolValues(queryPatients);
             foreach (Patient patient in queriedPatients)
@@ -83,6 +82,7 @@ namespace FIT3077_Pre1975.Controllers
                 newMonitorList.AddPatient(patient);
             }
 
+            
             AppContext.MonitorPatients = newMonitorList;
 
             return View("Monitor");
@@ -95,15 +95,10 @@ namespace FIT3077_Pre1975.Controllers
             return View("Monitor");
         }
 
-        public  ActionResult ShowDetail(string Id)
+        public ActionResult ShowDetail(string Id)
         {
-            return PartialView("PatientDetail", AppContext.Patients.GetPatientByID(Id));    
+            return PartialView("PatientDetail", AppContext.MonitorPatients.GetPatientByID(Id));
         }
-
-        public ActionResult UpdateMessage()
-        {
-            TempData["alertMessage"] = "Reload Successful";
-            return View();
-        }
-    }
+    } 
 }
+

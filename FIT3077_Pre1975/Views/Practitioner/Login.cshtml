@@ -10,15 +10,13 @@
         @using (Html.BeginForm("Login", "Practitioner", FormMethod.Post))
         {
             <h4>Enter practitioner ID to log in</h4>
-            <hr />
             @Html.TextBoxFor(m => m.Id)
-
-            <input type="submit" value="Login" />
+            <hr />
+            <button type="submit" class="btn btn-primary">Login</button>
         }
         @if (TempData["ErrorMessage"] != null)
         {
             Html.RenderPartial("_LoginError", TempData["ErrorMessage"]);
         }
-        <hr />
 
     </div>

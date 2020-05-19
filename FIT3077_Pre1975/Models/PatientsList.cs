@@ -1,6 +1,5 @@
-﻿using FIT3077_Pre1975.Helpers;
-using FIT3077_Pre1975.Models;
-using FIT3077_Pre1975.Observers;
+﻿using FIT3077_Pre1975.Models;
+using FIT3077_Pre1975.Patterns;
 using FIT3077_Pre1975.Services;
 using System;
 using System.Collections;
@@ -31,11 +30,26 @@ namespace FIT3077_Pre1975.Models
             get { return _patients.Count; }
         }
 
-        public void AddPatient(Patient patient) {
+        public void AddPatient(Patient patient) 
+        {
             _patients.Add(patient);
         }
 
-        public Patient GetPatientAt(int index) {
+        public bool Contains(Patient paramPatient)
+        {
+            foreach (Patient patient in this)
+            {
+                if (patient.Id.Equals(paramPatient.Id))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public Patient GetPatientAt(int index) 
+        {
             if (index >= 0 && index < Count)
             {
                 return _patients[index];

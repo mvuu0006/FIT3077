@@ -1,15 +1,213 @@
-﻿@{
-    ViewData["Title"] = "Monitor";
-}
+﻿@model FIT3077_Pre1975.Models.PatientsList
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js" type="text/javascript"></script>
 
-    <div>
-        <h4>Monitor List</h4>
-        <hr />
-        <div class="partialContents" data-url="/PatientList/GetMonitorList">
-            <button class="btn btn-primary" type="button" style="width: 100%" disabled>
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Loading...
-            </button>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.2.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script>
+    var TeamDetailPostBackURL = 'ShowDetail';
+    $(function () {
+        $(".anchorDetail").click(function () {
+
+            var $buttonClicked = $(this);
+            var id = $buttonClicked.attr('data-id');
+            var options = { "backdrop": "static", keyboard: true };
+            $.ajax({
+                type: "GET",
+                url: TeamDetailPostBackURL,
+                contentType: "application/json; charset=utf-8",
+                data: { "Id": id },
+                datatype: "json",
+                success: function (data) {
+
+                    $('#myModalContent').html(data);
+                    $('#myModal').modal(options);
+                    $('#myModal').modal('show');
+
+                },
+                error: function () {
+                    alert("Dynamic content load failed.");
+                }
+            });
+        });
+
+        $("#closbtn").click(function () {
+            $('#myModal').modal('hide');
+        });
+    });
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        var total = 0;
+        var rowCount = 0;
+        $('td').each(function () {
+            if ($(this).hasClass('patientvalue')) {
+                var row = $(this).closest("tr")[0];
+                total += parseFloat(row.cells[2].innerHTML.split()[0]);
+                rowCount++;
+            }
+        });
+        var average = total / rowCount;
+        $("td").each(function () {
+            if ($(this).hasClass('patientvalue')) {
+                var row = $(this).closest("tr")[0];
+                if (parseFloat(row.cells[2].innerHTML.split()[0]) > average) {
+                    row.classList.add("highlight");
+                }
+            }
+        });
+    });
+</script>
+
+
+<div>
+    <h4>Patients List</h4>
+    <hr />
+    <table class="table" id="table">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Total Cholesterol</th>
+                <th scope="col">Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                int count = 1;
+                foreach (Patient patient in Model)
+                {
+
+                    <tr id=@patient.Id>
+                        <td>@patient.Id</td>
+                        <td>@patient.Name</td>
+                        @if (patient.Observations.Count == 0)
+                        {
+                            <td>No Data</td>
+                            <td>No Data</td>
+                        }
+                        else
+                        {
+                            <td class="patientvalue">@patient.Observations[0].MeasurementResult.Value @patient.Observations[0].MeasurementResult.Unit</td>
+                            <td>@patient.Observations[0].Issued</td>
+                        }
+                        <td>
+                            <a href="javascript:void(0);" class="anchorDetail" data-id="@patient.Id">Details</a>
+                        </td>
+                    </tr>
+
+                    count++;
+                }
+            }
+        </tbody>
+
+    </table>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id='myModalContent'></div>
+            </div>
         </div>
+
     </div>
+    <div style="position:relative; left:15px" class="form-group row">
+        <div class="col-xs-2">
+            <input type="text" id="interval" class="form-control" value="5" data-content="5">
+        </div>
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="button" id="reset">Submit</button>
+        </div>
+
+    </div>
+    <small style="position:relative; top:-10px; left:10px" id="help" class="form-text text-muted">Set update interval (seconds).</small>
+</div>
+
+<style>
+    .highlight {
+        color: red;
+        border-color: #1861ac;
+    }
+</style>
+
+<script type="text/javascript">
+
+    function Update() {
+        var IdList = [];
+
+        $('td').each(function () {
+            if ($(this).hasClass('anchorDetail')) {
+                IdList.push($(this).attr('data-id'));
+            }
+        });
+
+        $.ajax({
+            url: '@Url.Action("ResetMonitorList", "PatientList")',
+            data: { ListId: IdList },
+            dataType: "json",
+            type: 'POST',
+            traditional: true,
+        });
+
+        //alert("UPDATED");
+        ;
+
+    }
+
+</script>
+
+<script>
+    function Timer(fn, t) {
+        var timerObj = setInterval(fn, t);
+
+        this.stop = function () {
+            if (timerObj) {
+                clearInterval(timerObj);
+                timerObj = null;
+            }
+            return this;
+        }
+
+        // start timer using current settings (if it's not already running)
+        this.start = function () {
+            if (!timerObj) {
+                this.stop();
+                timerObj = setInterval(fn, t);
+            }
+            return this;
+        }
+
+        // start with new or original interval, stop current interval
+        this.reset = function (newT = t) {
+            t = newT;
+            return this.stop().start();
+        }
+    }
+    var countdown = 5;
+    var timer = new Timer(function () {
+        document.getElementById("demo").innerHTML = "Data updated after: " + countdown + " seconds.";
+        countdown -= 1;
+
+        if (countdown < 0) {
+            Update();
+            countdown = parseInt(document.getElementById("interval").dataset.content);
+            
+        }
+
+    }, 1000);
+    timer.start();
+
+    document.getElementById("reset").addEventListener("click", function (e) {
+        console.log(document.getElementById("interval").innerHTML);
+        countdown = document.getElementById("interval").value;
+        document.getElementById("interval").dataset.content = document.getElementById("interval").value;
+        timer.reset(1000);
+    });
+</script>
+
+
+<p style="position:relative; top:20px" id="demo"></p>
 
