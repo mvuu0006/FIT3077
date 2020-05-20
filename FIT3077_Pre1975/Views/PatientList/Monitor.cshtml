@@ -76,6 +76,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">Total Cholesterol</th>
                 <th scope="col">Time</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -84,7 +85,6 @@
                 int count = 1;
                 foreach (Patient patient in Model)
                 {
-
                     <tr id=@patient.Id>
                         <td>@patient.Id</td>
                         <td>@patient.Name</td>
@@ -99,7 +99,10 @@
                             <td>@patient.Observations[0].Issued</td>
                         }
                         <td>
-                            <a href="javascript:void(0);" class="anchorDetail" data-id="@patient.Id">Details</a>
+                            <button href="javascript:void(0);" class="anchorDetail btn btn-link" data-id="@patient.Id">Details</button>
+                        </td>
+                        <td>
+                            <button type="button" class="delete btn btn-danger" data-id="@patient.Id">Remove</button>
                         </td>
                     </tr>
 
@@ -109,7 +112,7 @@
         </tbody>
 
     </table>
-    <div id='myModal' class='modal'>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div id='myModalContent'></div>
@@ -117,6 +120,16 @@
         </div>
 
     </div>
+    <div style="position:relative; left:15px" class="form-group row">
+        <div class="col-xs-2">
+            <input type="text" id="interval" class="form-control" value="15" data-content="15">
+        </div>
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="button" id="reset">Submit</button>
+        </div>
+
+    </div>
+    <small style="position:relative; top:-10px; left:10px" id="help" class="form-text text-muted">Set update interval (seconds).</small>
 </div>
 
 <style>
@@ -125,3 +138,97 @@
         border-color: #1861ac;
     }
 </style>
+
+<script type="text/javascript">
+
+    function Update() {
+        var IdList = [];
+
+        $('td').each(function () {
+            if ($(this).hasClass('anchorDetail')) {
+                IdList.push($(this).attr('data-id'));
+            }
+        });
+
+        $.ajax({
+            url: '@Url.Action("ResetMonitorList", "PatientList")',
+            data: { ListId: IdList },
+            dataType: "json",
+            type: 'POST',
+            traditional: true,
+        });
+        //alert("UPDATED");
+        ;
+
+    }
+
+</script>
+
+<script>
+    function Timer(fn, t) {
+        var timerObj = setInterval(fn, t);
+
+        this.stop = function () {
+            if (timerObj) {
+                clearInterval(timerObj);
+                timerObj = null;
+            }
+            return this;
+        }
+
+        // start timer using current settings (if it's not already running)
+        this.start = function () {
+            if (!timerObj) {
+                this.stop();
+                timerObj = setInterval(fn, t);
+            }
+            return this;
+        }
+
+        // start with new or original interval, stop current interval
+        this.reset = function (newT = t) {
+            t = newT;
+            return this.stop().start();
+        }
+    }
+    var countdown = 15;
+    var timer = new Timer(function () {
+        document.getElementById("demo").innerHTML = "Data updated after: " + countdown + " seconds.";
+        countdown -= 1;
+
+        if (countdown < 0) {
+            Update();
+            countdown = parseInt(document.getElementById("interval").dataset.content);
+            
+        }
+
+    }, 1000);
+    timer.start();
+
+    document.getElementById("reset").addEventListener("click", function (e) {
+        console.log(document.getElementById("interval").innerHTML);
+        countdown = document.getElementById("interval").value;
+        document.getElementById("interval").dataset.content = document.getElementById("interval").value;
+        timer.reset(1000);
+    });
+</script>
+
+
+<p style="position:relative; top:20px" id="demo"></p>
+
+<script>
+    $(".delete").on("click", function () {
+    if (confirm("Do you want to remove this patient ?")) {
+        var id = $(this).attr('data-id');
+        var tr = $(this).closest('tr');
+        tr.remove();
+        $.ajax({
+            url: '@Url.Action("RemoveMonitorPatient", "PatientList")',
+            data: { Id: id },
+            dataType: "json",
+            type: 'POST',
+            traditional: true,
+        });
+    }
+    });
+</script>
