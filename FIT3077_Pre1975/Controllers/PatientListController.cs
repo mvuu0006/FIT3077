@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FIT3077_Pre1975.Models;
 using FIT3077_Pre1975.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FIT3077_Pre1975.Controllers
 {
@@ -24,14 +23,14 @@ namespace FIT3077_Pre1975.Controllers
             {
                 return View();
             }
-            
+
         }
 
         public ActionResult GetPatientList()
         {
             while (AppContext.Patients.IsLoading == true)
             {
-                Thread.Sleep(500); 
+                Thread.Sleep(500);
             }
             return PartialView(AppContext.Patients);
         }
@@ -71,7 +70,7 @@ namespace FIT3077_Pre1975.Controllers
                     {
                         newMonitorList.AddPatient(patient);
                     }
-                } 
+                }
                 else
                 {
                     patient.Selected = false;
@@ -83,8 +82,16 @@ namespace FIT3077_Pre1975.Controllers
                 newMonitorList.AddPatient(patient);
             }
 
+            
             AppContext.MonitorPatients = newMonitorList;
 
+            return View("Monitor");
+        }
+
+        public async Task<ActionResult> ResetMonitorList(List<string> ListId)
+        {
+            PatientsList queriedPatients = await FhirService.GetCholesterolValues(AppContext.MonitorPatients);
+            AppContext.MonitorPatients = queriedPatients;
             return View("Monitor");
         }
 
@@ -92,5 +99,13 @@ namespace FIT3077_Pre1975.Controllers
         {
             return PartialView("PatientDetail", AppContext.MonitorPatients.GetPatientByID(Id));
         }
-    }
+
+        public EmptyResult RemoveMonitorPatient(string Id)
+        {
+            AppContext.MonitorPatients.GetPatientByID(Id).Selected = false;
+            AppContext.MonitorPatients.RemovePatientByID(Id);
+            return new EmptyResult();
+        }
+    } 
 }
+

@@ -90,5 +90,17 @@ namespace FIT3077_Pre1975.Models
         {
             throw new NotImplementedException();
         }
+
+        public void RemovePatientByID(string Id)
+        {
+            foreach (Patient patient in _patients)
+            {
+                if (patient.Id == Id)
+                {
+                    _patients.Remove(patient);
+                    break;
+                }
+            }
+        }
     }
 }
