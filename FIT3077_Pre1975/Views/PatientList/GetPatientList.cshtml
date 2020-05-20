@@ -12,26 +12,24 @@
 
 <script>
     $(document).ready(function () {
-        $("#table123 input").click(function () {
-            $('th > :checkbox').click(function () {
-                if ($(this).is(":checked")) {
-                    $(this).closest('table')
-                        .find('td > :checkbox')
-                        .attr('checked', $(this).is(':checked'))
-                        .prop('checked', $(this).is(':checked'))
-                        .parent().parent().addClass("highlight");
-                } else {
-                    $(this).closest('table')
-                        .find('td > :checkbox')
-                        .attr('checked', $(this).is(':checked'))
-                        .prop('checked', $(this).is(':checked'))
-                        .parent().parent().removeClass("highlight");
-                }
-                $(this).parent().parent().removeClass("highlight");
-            });
+        $("#table123 th > input").click(function () {
+            if ($(this).is(":checked")) {
+                $(this).closest('table')
+                    .find('td > :checkbox')
+                    .attr('checked', $(this).is(':checked'))
+                    .prop('checked', $(this).is(':checked'))
+                    .parent().parent().addClass("highlight");
+            } else {
+                $(this).closest('table')
+                    .find('td > :checkbox')
+                    .attr('checked', $(this).is(':checked'))
+                    .prop('checked', $(this).is(':checked'))
+                    .parent().parent().removeClass("highlight");
+            }
+            $(this).parent().parent().removeClass("highlight");
         });
 
-        $("#table123 input").click(function () {
+        $("#table123 td > input").click(function () {
             if ($(this).is(":checked")) {
                 $(this).parent().parent().addClass("highlight");
             } else {
