@@ -35,6 +35,7 @@ namespace FIT3077_Pre1975.Controllers
             if (newPractitioner != null)
             {
                 AppContext.Practitioner = newPractitioner;
+                AppContext.MonitorPatients = new PatientsList();
                 AppContext.Practitioner.Notify();
                 return Redirect("/Practitioner/");
             }

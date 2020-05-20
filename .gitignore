@@ -431,3 +431,5 @@ $RECYCLE.BIN/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+/FIT3077_Pre1975/Data/large_data.csv
+/FIT3077_Pre1975/Data/huge_data.csv

@@ -1,4 +1,7 @@
 ﻿@model FIT3077_Pre1975.Models.PatientsList
+@{
+    ViewData["Title"] = "Monitor List";
+}
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js" type="text/javascript"></script>
 
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.2.min.js"></script>
@@ -64,7 +67,7 @@
 
 
 <div>
-    <h4>Patients List</h4>
+    <h4>Monitored Patients</h4>
     <hr />
     <table class="table" id="table">
         <thead>
@@ -82,27 +85,26 @@
                 int count = 1;
                 foreach (Patient patient in Model)
                 {
-
-            <tr id=@patient.Id>
-                <td>@patient.Id</td>
-                <td>@patient.Name</td>
-                @if (patient.Observations.Count == 0)
-                {
-                    <td>No Data</td>
-                    <td>No Data</td>
-                }
-                else
-                {
-                    <td class="patientvalue">@patient.Observations[0].MeasurementResult.Value @patient.Observations[0].MeasurementResult.Unit</td>
-                    <td>@patient.Observations[0].Issued</td>
-                }
-                <td>
-                    <a href="javascript:void(0);" class="anchorDetail" data-id="@patient.Id">Details</a>
-                </td>
-                <td>
-                    <button type="button" class="delete" data-id="@patient.Id">Remove</button>
-                </td>
-            </tr>
+                    <tr id=@patient.Id>
+                        <td>@patient.Id</td>
+                        <td>@patient.Name</td>
+                        @if (patient.Observations.Count == 0)
+                        {
+                            <td>No Data</td>
+                            <td>No Data</td>
+                        }
+                        else
+                        {
+                            <td class="patientvalue">@patient.Observations[0].MeasurementResult.Value @patient.Observations[0].MeasurementResult.Unit</td>
+                            <td>@patient.Observations[0].Issued</td>
+                        }
+                        <td>
+                            <button href="javascript:void(0);" class="anchorDetail btn btn-link" data-id="@patient.Id">Details</button>
+                        </td>
+                        <td>
+                            <button type="button" class="delete btn btn-danger" data-id="@patient.Id">Remove</button>
+                        </td>
+                    </tr>
 
                     count++;
                 }
@@ -120,7 +122,7 @@
     </div>
     <div style="position:relative; left:15px" class="form-group row">
         <div class="col-xs-2">
-            <input type="text" id="interval" class="form-control" value="5" data-content="5">
+            <input type="text" id="interval" class="form-control" value="15" data-content="15">
         </div>
         <div class="input-group-append">
             <button class="btn btn-primary" type="button" id="reset">Submit</button>
@@ -189,7 +191,7 @@
             return this.stop().start();
         }
     }
-    var countdown = 5;
+    var countdown = 15;
     var timer = new Timer(function () {
         document.getElementById("demo").innerHTML = "Data updated after: " + countdown + " seconds.";
         countdown -= 1;

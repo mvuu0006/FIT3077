@@ -24,19 +24,6 @@ namespace FIT3077_Pre1975.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        /*public Action InputId() 
-        {
-            lists = FhirService.GetPatientsOfPractitioner(500);
-
-            
-
-        }*/
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
