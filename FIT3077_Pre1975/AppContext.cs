@@ -1,4 +1,5 @@
 ﻿using FIT3077_Pre1975.Models;
+using Microsoft.ML;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace FIT3077_Pre1975
         internal static PatientsList MonitorPatients { get; set; } = new PatientsList();
 
         internal static PatientsList AnalysisData { get; set; } = new PatientsList();
+
+        internal static MLContext MlContext = new MLContext();
 
         private static Practitioner _practitioner;
 

@@ -2,25 +2,24 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th scope="row">Get started</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row"><a href="/Practitioner/Index">Enter your ID</a></th>
-                
-            </tr>
-            <tr>
-                <th scope="row">See patients list</th>
-            </tr>
-            <tr>
-                <th scope="row">See patients monitored</th>
-            </tr>
-        </tbody>
-    </table>
+<h4>Home Page</h4>
+<hr/>
+<div class="card" style="width: 25rem;">
+    <div class="card-header">
+        Welcome
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <a href="/Practitioner/Index">Enter your ID</a>
+        </li>
+        <li class="list-group-item">
+            <a href="/PatientList/Index">Patient List</a>
+        </li>
+        <li class="list-group-item">
+            <a href="/PatientList/Monitor">Monitor List</a>
+        </li>
+        <li class="list-group-item">
+            <a href="/MLAnalysis/Index">ML Analysis</a>
+        </li>
+    </ul>
 </div>
