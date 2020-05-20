@@ -122,14 +122,11 @@
     </div>
     <div style="position:relative; left:15px" class="form-group row">
         <div class="col-xs-2">
-
             <input type="text" id="interval" class="form-control" data-content="10">
-
         </div>
         <div class="input-group-append">
             <button class="btn btn-primary" type="button" id="reset">Submit</button>
         </div>
-
     </div>
     <small style="position:relative; top:-10px; left:10px" id="help" class="form-text text-muted">Set update interval (seconds).</small>
 </div>
@@ -208,7 +205,7 @@
         countdown = data;
         document.getElementById("interval").dataset.content = toString(countdown);
         var timer = new Timer(function () {
-            document.getElementById("demo").innerHTML = "Data updated after: " + countdown + " seconds.";
+            document.getElementById("demo").innerHTML = "Data update after: " + countdown + " seconds.";
             countdown -= 1;
             if (countdown < 0) {
                 Update();
