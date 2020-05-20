@@ -22,8 +22,6 @@ namespace FIT3077_Pre1975.Models
 
         public Address Address { get; set; }
 
-        public Practitioner Carer;
-
         public List<Observation> Observations { get; set; }
 
         public bool HasObservations { get; set; } = false;

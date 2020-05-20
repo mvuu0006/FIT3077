@@ -20,7 +20,7 @@ namespace FIT3077_Pre1975.Services
 
         private const int LIMIT_ENTRY = 200;
 
-        private const int NUMBER_OF_DATA_RECORD = 11000;
+        private const int NUMBER_OF_DATA_RECORD = 200;
 
         private static readonly FhirClient Client = new FhirClient(SERVICE_ROOT_URL) { Timeout = SERVICE_TIMEOUT };
 
@@ -94,7 +94,6 @@ namespace FIT3077_Pre1975.Services
                         Hl7.Fhir.Model.Patient fhirPatient = (Hl7.Fhir.Model.Patient)PatientResult.Entry[0].Resource;
                         PatientMapper mapper = new PatientMapper();
                         Models.Patient patient = mapper.Map(fhirPatient);
-                        patient.Carer = carer;
                         patientList.Add(patient);
                     }
                 }
