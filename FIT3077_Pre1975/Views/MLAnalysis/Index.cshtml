@@ -3,9 +3,28 @@
     ViewData["Title"] = "ML Analysis";
 }
 
-<h1>Analysis</h1>
+@if (ViewBag.done != null && ViewBag.done == 1)
+{
+    <script>
+        $(".alert").show();
+    </script>
+    ViewBag.done = 0;
+}
+
+<h4>Analysis</h4>
+
+<div class="alert alert-success alert-dismissible">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Success!</strong> Data is written to csv file.
+</div>
 
 <hr/>
-<div><button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("BuildModel", "MLAnalysis")'">Rebuild Model</button></div>
+<div><button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("TrainModel", "MLAnalysis")'">Train ML Model</button></div>
 <hr/>
-<div><button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("LoadData", "MLAnalysis")'">Reload Data</button></div>
+<div><button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("GetData", "MLAnalysis")'">Get More Data</button></div>
+
+<style>
+    .alert {
+        display: none;
+    }
+</style>

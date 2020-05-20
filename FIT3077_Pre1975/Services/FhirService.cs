@@ -1,8 +1,11 @@
-﻿using FIT3077_Pre1975.Mappings;
+﻿using FIT3077_Pre1975.Helpers;
+using FIT3077_Pre1975.Mappings;
 using FIT3077_Pre1975.Models;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
+using Hl7.FhirPath.Sprache;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +18,9 @@ namespace FIT3077_Pre1975.Services
 
         private const int SERVICE_TIMEOUT = 60 * 1000;
 
-        private const int LIMIT_ENTRY = 10000;
+        private const int LIMIT_ENTRY = 200;
+
+        private const int NUMBER_OF_DATA_RECORD = 11000;
 
         private static readonly FhirClient Client = new FhirClient(SERVICE_ROOT_URL) { Timeout = SERVICE_TIMEOUT };
 
@@ -67,12 +72,17 @@ namespace FIT3077_Pre1975.Services
                     .LimitTo(LIMIT_ENTRY);
                 Bundle Result = await Client.SearchAsync<Encounter>(encounterQuery);
 
-                foreach (var Entry in Result.Entry)
+                while (Result != null)
                 {
-                    Encounter encounter = (Encounter)Entry.Resource;
-                    string patientRef = encounter.Subject.Reference;
-                    string patientId = patientRef.Split('/')[1];
-                    patientIdList.Add(patientId);
+                    foreach (var Entry in Result.Entry)
+                    {
+                        Encounter encounter = (Encounter)Entry.Resource;
+                        string patientRef = encounter.Subject.Reference;
+                        string patientId = patientRef.Split('/')[1];
+                        patientIdList.Add(patientId);
+                    }
+
+                    Result = Client.Continue(Result, PageDirection.Next);
                 }
 
                 foreach (var patientId in patientIdList)
@@ -153,7 +163,7 @@ namespace FIT3077_Pre1975.Services
             try
             {
                 var ObservationQuery = new SearchParams()
-                        .Where("patient=" + patient.Id)
+                        .Where("patient=" + currentPatient.Id)
                         .OrderBy("-date")
                         .LimitTo(LIMIT_ENTRY);
 
@@ -184,6 +194,68 @@ namespace FIT3077_Pre1975.Services
             }
 
             return currentPatient;
+        }
+
+        public static async Task<PatientsList> GetData()
+        {
+            int count = 0;
+            bool stop = false;
+
+            PatientsList data = new PatientsList();
+
+            try
+            {
+
+                var PatientQuery = new SearchParams().LimitTo(LIMIT_ENTRY);
+
+                Bundle PatientResult = await Client.SearchAsync<Hl7.Fhir.Model.Patient>(PatientQuery);
+
+                while (PatientResult != null)
+                {
+                    if (stop) break;
+
+                    foreach (var Entry in PatientResult.Entry)
+                    {
+                        Hl7.Fhir.Model.Patient fhirPatient = (Hl7.Fhir.Model.Patient) Entry.Resource;
+                        PatientMapper mapper = new PatientMapper();
+                        Models.Patient patient = mapper.Map(fhirPatient);
+                        
+                        if (!AppContext.AnalysisData.Contains(patient) && !data.Contains(patient))
+                        {
+                            var CholesterolQuery = new SearchParams()
+                                .Where("patient=" + patient.Id)
+                                .Where("code=2093-3")
+                                .OrderBy("-date")
+                                .LimitTo(1);
+
+                            Bundle CholesterolResult = await Client.SearchAsync<Hl7.Fhir.Model.Observation>(CholesterolQuery);
+                            if (CholesterolResult.Entry.Count > 0)
+                            {
+                                data.AddPatient(await GetDataForAnalysis(patient));
+                                count++;
+                            }
+                        }
+
+                        if (count == NUMBER_OF_DATA_RECORD)
+                        {
+                            stop = true;
+                            break;
+                        }
+                    }
+
+                    PatientResult = Client.Continue(PatientResult, PageDirection.Next);
+                }
+            }
+            catch (FhirOperationException FhirException)
+            {
+                System.Diagnostics.Debug.WriteLine("Fhir error message: " + FhirException.Message);
+            }
+            catch (Exception GeneralException)
+            {
+                System.Diagnostics.Debug.WriteLine("General error message: " + GeneralException.Message);
+            }
+
+            return data;
         }
     }
 }

@@ -1,3 +1,9 @@
-# project
+# FIT3077 Project
 
-FIT3077 project repository
+Authors:
+* Duc Nguyen
+* Hieu Vu
+
+Technology:
+* ASP.NET Core3 MVC Web Application.
+* ML.NET, ML.NET.FastTree to train data model.
