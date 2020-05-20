@@ -120,7 +120,7 @@
     </div>
     <div style="position:relative; left:15px" class="form-group row">
         <div class="col-xs-2">
-            <input type="text" id="interval" class="form-control" value="5" data-content="5">
+            <input type="text" id="interval" class="form-control" data-content="10">
         </div>
         <div class="input-group-append">
             <button class="btn btn-primary" type="button" id="reset">Submit</button>
@@ -155,7 +155,7 @@
             type: 'POST',
             traditional: true,
         });
-        //alert("UPDATED");
+        alert("UPDATED");
         ;
 
     }
@@ -189,26 +189,42 @@
             return this.stop().start();
         }
     }
-    var countdown = 5;
-    var timer = new Timer(function () {
-        document.getElementById("demo").innerHTML = "Data updated after: " + countdown + " seconds.";
-        countdown -= 1;
-
-        if (countdown < 0) {
-            Update();
-            countdown = parseInt(document.getElementById("interval").dataset.content);
-            
-        }
-
-    }, 1000);
-    timer.start();
-
-    document.getElementById("reset").addEventListener("click", function (e) {
-        console.log(document.getElementById("interval").innerHTML);
-        countdown = document.getElementById("interval").value;
-        document.getElementById("interval").dataset.content = document.getElementById("interval").value;
-        timer.reset(1000);
+    var countdown;
+    $.ajax({
+        url: '@Url.Action("GetUpdateInterval", "PatientList")',
+        dataType: "json",
+        data: {},
+        traditional: true,
+        success: function (result) {
+            callback(result);
+        },
     });
+    function callback(data) {
+        countdown = data;
+        document.getElementById("interval").dataset.content = toString(countdown);
+        var timer = new Timer(function () {
+            document.getElementById("demo").innerHTML = "Data updated after: " + countdown + " seconds.";
+            countdown -= 1;
+            if (countdown < 0) {
+                Update();
+                countdown = data;   
+            }
+        }, 1000);
+        timer.start();
+
+        document.getElementById("reset").addEventListener("click", function (e) {
+            countdown = document.getElementById("interval").value;
+            document.getElementById("interval").dataset.content = document.getElementById("interval").value;
+            timer.reset(1000);
+            $.ajax({
+                url: '@Url.Action("SetUpdateInterval", "PatientList")',
+                data: { newInterval: document.getElementById("interval").value },
+                dataType: "json",
+                type: 'POST',
+                traditional: true,
+            });
+        });
+    }
 </script>
 
 
