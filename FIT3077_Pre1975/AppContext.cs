@@ -31,5 +31,7 @@ namespace FIT3077_Pre1975
                 _practitioner.Attach(Patients);
             }
         }
+
+        internal static int Interval { get; set; } = 10; //default value for Interval
     }
 }

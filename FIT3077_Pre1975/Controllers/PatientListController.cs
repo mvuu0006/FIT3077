@@ -106,6 +106,17 @@ namespace FIT3077_Pre1975.Controllers
             AppContext.MonitorPatients.RemovePatientByID(Id);
             return new EmptyResult();
         }
+
+        public EmptyResult SetUpdateInterval(int newInterval)
+        {
+            AppContext.Interval = newInterval;
+            return new EmptyResult();
+        }
+
+        public JsonResult GetUpdateInterval()
+        {
+            return Json(AppContext.Interval);
+        }
     } 
 }
 
