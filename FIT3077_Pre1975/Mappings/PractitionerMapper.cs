@@ -1,10 +1,5 @@
 ﻿using FIT3077_Pre1975.Models;
-using Hl7.Fhir.Model;
-using Hl7.Fhir.Support;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 /// <summary>
 /// Concrete Mapper class to map Fhir model Practitioner into an Practitioner object

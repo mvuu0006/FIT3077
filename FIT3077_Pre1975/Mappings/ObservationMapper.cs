@@ -1,8 +1,5 @@
 ﻿using FIT3077_Pre1975.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 /// <summary>
 /// Concrete Mapper class to map Fhir model observation into an Observation object
