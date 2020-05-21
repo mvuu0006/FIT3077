@@ -1,11 +1,9 @@
-﻿using FIT3077_Pre1975.Helpers;
-using FIT3077_Pre1975.Mappings;
+﻿using FIT3077_Pre1975.Mappings;
 using FIT3077_Pre1975.Models;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
 using Hl7.FhirPath.Sprache;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -238,7 +236,9 @@ namespace FIT3077_Pre1975.Services
             try
             {
 
-                var PatientQuery = new SearchParams().LimitTo(LIMIT_ENTRY);
+                var PatientQuery = new SearchParams()
+                    .OrderBy("birthdate")
+                    .LimitTo(LIMIT_ENTRY);
 
                 Bundle PatientResult = await Client.SearchAsync<Hl7.Fhir.Model.Patient>(PatientQuery);
 
