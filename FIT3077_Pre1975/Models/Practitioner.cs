@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
-
+    /// <summary>
+    /// Model Practitioner in the Application
+    /// </summary>
     public class Practitioner : IObservableSubject
     {
         public string Id { get; set; }
@@ -35,6 +37,9 @@ namespace FIT3077_Pre1975.Models
             this._observers.Remove(observer);
         }
 
+        /// <summary>
+        /// Notify Practitioner's observers to update
+        /// </summary>
         public void Notify()
         {
             foreach (var observer in _observers)

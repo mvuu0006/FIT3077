@@ -7,11 +7,15 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
+    /// <summary>
+    /// Model a Patient Data used for ML Task
+    /// </summary>
     public class PatientData
     {
 
         public const int NUMBER_OF_FEATURES = 13;
 
+        // List of features
         public static List<string> attributes = new List<string>(new string[NUMBER_OF_FEATURES] 
         {
             "Body Height", 
@@ -37,6 +41,10 @@ namespace FIT3077_Pre1975.Models
         [VectorType(NUMBER_OF_FEATURES)]
         public Single[] Features { get; set; } 
 
+        /// <summary>
+        /// To csv line format
+        /// </summary>
+        /// <returns> a string represents a single record in csv file</returns>
         public override string ToString()
         {
             string output = $"{HighCholesterol}";

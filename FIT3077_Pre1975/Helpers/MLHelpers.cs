@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Helpers
 {
+    /// <summary>
+    /// This class assists writing data to csv, reading data from csv and pre-precessing data for ML Model
+    /// </summary>
     public static class MLHelpers
     {
 
@@ -19,6 +22,10 @@ namespace FIT3077_Pre1975.Helpers
 
         public static string DATA_FILE_ROOT = @"Data\\data.csv";
 
+        /// <summary>
+        /// Write list of patients data to csv file
+        /// </summary>
+        /// <param name="data"> given patientslist data </param>
         public static void WriteToCsv(PatientsList data)
         {
             List<PatientData> outputPatients = new List<PatientData>();
@@ -36,6 +43,7 @@ namespace FIT3077_Pre1975.Helpers
 
                 int NaNCount = 0;
 
+                // get value of each feature and add to attributes array
                 for (int i = 0; i < PatientData.NUMBER_OF_FEATURES; i++)
                 {
                     attributes[i] = Single.NaN;
@@ -53,6 +61,7 @@ namespace FIT3077_Pre1975.Helpers
 
                 if (NaNCount > 0) continue;
 
+                // create a PatientData object with label and features
                 PatientData newData = new PatientData
                 {
                     HighCholesterol = label,
@@ -62,6 +71,8 @@ namespace FIT3077_Pre1975.Helpers
                 outputPatients.Add(newData);
             }
 
+            // if csv file exists, append data to the csv file
+            // otherwises, write headers and the data to new csv file
             if (!File.Exists(DATA_FILE_ROOT))
             {
                 File.WriteAllText(DATA_FILE_ROOT, string.Concat(
@@ -75,6 +86,10 @@ namespace FIT3077_Pre1975.Helpers
             }
         }
 
+        /// <summary>
+        /// Read data from a CSV file to ML Context
+        /// </summary>
+        /// <returns></returns>
         public static IDataView ReadFromCsv()
         {
 
@@ -84,6 +99,11 @@ namespace FIT3077_Pre1975.Helpers
             return data;
         }
 
+        /// <summary>
+        /// Pre-processing data before ML model
+        /// </summary>
+        /// <param name="data"> given data to be processed</param>
+        /// <returns> transformed data </returns>
         public static IDataView PrepareData(IDataView data) 
         {
             // Replace NaN with Average value

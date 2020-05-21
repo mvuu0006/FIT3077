@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
+    /// <summary>
+    /// Model a Patient List
+    /// </summary>
     public class PatientsList : IteratorAggregate, IObserver
     {
         private List<Patient> _patients;
@@ -30,11 +33,20 @@ namespace FIT3077_Pre1975.Models
             get { return _patients.Count; }
         }
 
+        /// <summary>
+        /// Add patient to a list
+        /// </summary>
+        /// <param name="patient"> added patient </param>
         public void AddPatient(Patient patient) 
         {
             _patients.Add(patient);
         }
 
+        /// <summary>
+        /// Check if the list contains a patient
+        /// </summary>
+        /// <param name="paramPatient"> patient to be checked </param>
+        /// <returns></returns>
         public bool Contains(Patient paramPatient)
         {
             foreach (Patient patient in this)
@@ -48,6 +60,11 @@ namespace FIT3077_Pre1975.Models
             return false;
         }
 
+        /// <summary>
+        /// Get Patient at index in the list
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public Patient GetPatientAt(int index) 
         {
             if (index >= 0 && index < Count)
@@ -60,6 +77,11 @@ namespace FIT3077_Pre1975.Models
             }
         }
 
+        /// <summary>
+        /// Get Patient by id, return null if 
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
         public Patient GetPatientByID(string ID) {
             foreach (Patient patient in _patients) { 
                 if (patient.Id == ID)
@@ -75,6 +97,11 @@ namespace FIT3077_Pre1975.Models
             return new PatientsListIterator(this);
         }
 
+        /// <summary>
+        /// Update PatientLists when the Practitioner changes
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <returns></returns>
         public async Task UpdateAsync(IObservableSubject subject)
         {
             IsLoading = true;
@@ -91,6 +118,10 @@ namespace FIT3077_Pre1975.Models
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Remove a Patient by ID from a list
+        /// </summary>
+        /// <param name="Id">ID of patient to be removed</param>
         public void RemovePatientByID(string Id)
         {
             foreach (Patient patient in _patients)

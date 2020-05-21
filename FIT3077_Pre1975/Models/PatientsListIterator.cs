@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
+    /// <summary>
+    /// Iterator class for PatientsList
+    /// </summary>
     public class PatientsListIterator : Iterator
     {
         private PatientsList _patientsList;
@@ -29,6 +32,10 @@ namespace FIT3077_Pre1975.Models
             return _position;
         }
 
+        /// <summary>
+        /// Go to next Patient in the list
+        /// </summary>
+        /// <returns>True of has next patient</returns>
         public override bool MoveNext()
         {
             int updatedPosition = _position + 1;

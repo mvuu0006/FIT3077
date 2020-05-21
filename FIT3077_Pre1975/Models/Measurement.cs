@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
+    /// <summary>
+    /// Models a single Measurement
+    /// </summary>
     public class Measurement
     {
 

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
+    /// <summary>
+    /// Model a Patient in the Application
+    /// </summary>
     public class Patient
     {
         public string Id { get; set; }
