@@ -43,6 +43,6 @@ namespace FIT3077_Pre1975
             }
         }
 
-        internal static int Interval { get; set; } = 10; //default value for Interval
+        internal static int Interval { get; set; } = 15; //default value for Interval
     }
 }

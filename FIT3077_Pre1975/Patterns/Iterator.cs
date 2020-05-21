@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Iterator abstract class to implement Iterator pattern
+/// </summary>
 namespace FIT3077_Pre1975.Patterns
 {
     public abstract class Iterator : IEnumerator

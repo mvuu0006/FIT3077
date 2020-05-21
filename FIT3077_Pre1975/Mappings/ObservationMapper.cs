@@ -4,12 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Concrete Mapper class to map Fhir model observation into an Observation object
+/// </summary>
 namespace FIT3077_Pre1975.Mappings
 {
     public class ObservationMapper : MapperBase<Models.Observation, Hl7.Fhir.Model.Observation>
     {
+        /// <summary>
+        /// Method to map a Fhir Model observation element to an Observation object
+        /// </summary>
+        /// <param name="element"> Observation element from Fhir model </param>
+        /// <returns> An Observation object with values from Fhir model element </returns>
         public override Models.Observation Map(Hl7.Fhir.Model.Observation element)
-        {
+        {   
+            /// create a new Observation object and map values from Fhir model to it
             var observation = new Observation
             {
                 Id = element.Id
