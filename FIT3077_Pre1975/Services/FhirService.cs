@@ -236,7 +236,9 @@ namespace FIT3077_Pre1975.Services
             try
             {
 
-                var PatientQuery = new SearchParams().LimitTo(LIMIT_ENTRY);
+                var PatientQuery = new SearchParams()
+                    .OrderBy("birthdate")
+                    .LimitTo(LIMIT_ENTRY);
 
                 Bundle PatientResult = await Client.SearchAsync<Hl7.Fhir.Model.Patient>(PatientQuery);
 
