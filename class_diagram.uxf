@@ -843,7 +843,7 @@ layer=-1</panel_attributes>
       <w>102</w>
       <h>222</h>
     </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
+    <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>20.0;10.0;150.0;10.0;150.0;350.0;10.0;350.0</additional_attributes>
   </element>
   <element>
@@ -878,7 +878,7 @@ layer=-1</panel_attributes>
       <w>102</w>
       <h>318</h>
     </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
+    <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>20.0;10.0;150.0;10.0;150.0;510.0;10.0;510.0</additional_attributes>
   </element>
   <element>
@@ -953,24 +953,12 @@ layer=-1</panel_attributes>
     <id>Relation</id>
     <coordinates>
       <x>984</x>
-      <y>840</y>
-      <w>150</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-Update</panel_attributes>
-    <additional_attributes>230.0;20.0;10.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>984</x>
       <y>888</y>
       <w>150</w>
       <h>24</h>
     </coordinates>
-    <panel_attributes>lt=&lt;-
-Execute event</panel_attributes>
+    <panel_attributes>lt=&lt;.
+execute event</panel_attributes>
     <additional_attributes>10.0;20.0;230.0;20.0</additional_attributes>
   </element>
   <element>
@@ -979,9 +967,17 @@ Execute event</panel_attributes>
       <x>972</x>
       <y>516</y>
       <w>162</w>
-      <h>168</h>
+      <h>174</h>
     </coordinates>
-    <panel_attributes>lt=&lt;.</panel_attributes>
+    <panel_attributes>lt=&lt;-
+m1=1
+m2=0..*
+
+
+
+
+
+&lt; represent</panel_attributes>
     <additional_attributes>10.0;10.0;80.0;10.0;80.0;260.0;250.0;260.0</additional_attributes>
   </element>
   <element>
@@ -1089,5 +1085,19 @@ view to corresponding
 controller
 </panel_attributes>
     <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>984</x>
+      <y>846</y>
+      <w>150</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+m1=1
+m2=1..*
+update &gt;</panel_attributes>
+    <additional_attributes>10.0;20.0;230.0;20.0</additional_attributes>
   </element>
 </diagram>

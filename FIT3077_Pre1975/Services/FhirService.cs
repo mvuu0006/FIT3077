@@ -12,6 +12,10 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Services
 {
+    /// <summary>
+    /// This class handles interactions with HAPI FHIR API library
+    /// Including getting data for the web application, mapping data and getting data for ML task
+    /// </summary>
     public static class FhirService
     {
         private const string SERVICE_ROOT_URL = "https://fhir.monash.edu/hapi-fhir-jpaserver/fhir";
@@ -24,6 +28,11 @@ namespace FIT3077_Pre1975.Services
 
         private static readonly FhirClient Client = new FhirClient(SERVICE_ROOT_URL) { Timeout = SERVICE_TIMEOUT };
 
+        /// <summary>
+        /// Get Practitioner by ID
+        /// </summary>
+        /// <param name="practitionerId"> ID of practitioner to be fetched </param>
+        /// <returns> Practitioner </returns>
         public static async Task<Models.Practitioner> GetPractitioner(string practitionerId)
         {
             Models.Practitioner practitioner = null;
@@ -31,14 +40,16 @@ namespace FIT3077_Pre1975.Services
 
             try
             {
+                // limit to 1 to avoid huge response Bundle
                 var PractitionerQuery = new SearchParams()
                     .Where("identifier=http://hl7.org/fhir/sid/us-npi|" + practitionerId)
-                    .LimitTo(LIMIT_ENTRY);
+                    .LimitTo(1);
 
                 Bundle PractitionerResult = await Client.SearchAsync<Hl7.Fhir.Model.Practitioner>(PractitionerQuery);
 
                 if (PractitionerResult.Entry.Count > 0)
                 {
+                    // Map the FHIR Practitioner object to App's Practitioner object
                     fhirPractitioner = (Hl7.Fhir.Model.Practitioner)PractitionerResult.Entry[0].Resource;
                     PractitionerMapper mapper = new PractitionerMapper();
                     practitioner = mapper.Map(fhirPractitioner);
@@ -55,13 +66,16 @@ namespace FIT3077_Pre1975.Services
             return practitioner;
         }
 
+        /// <summary>
+        /// Get all patients of a given Practitioner
+        /// </summary>
+        /// <param name="practitionerId"></param>
+        /// <returns> a list of Patients </returns>
         public static async Task<List<Models.Patient>> GetPatientsOfPractitioner(string practitionerId)
         {
             List<Models.Patient> patientList = new List<Models.Patient>();
 
             SortedSet<string> patientIdList = new SortedSet<string>();
-
-            Models.Practitioner carer = await GetPractitioner(practitionerId);
 
             try
             {
@@ -72,10 +86,12 @@ namespace FIT3077_Pre1975.Services
                     .LimitTo(LIMIT_ENTRY);
                 Bundle Result = await Client.SearchAsync<Encounter>(encounterQuery);
 
+                // implement paging for HAPI FHIR API Bundle
                 while (Result != null)
                 {
                     foreach (var Entry in Result.Entry)
                     {
+                        // Get patient id and add to a list
                         Encounter encounter = (Encounter)Entry.Resource;
                         string patientRef = encounter.Subject.Reference;
                         string patientId = patientRef.Split('/')[1];
@@ -85,12 +101,14 @@ namespace FIT3077_Pre1975.Services
                     Result = Client.Continue(Result, PageDirection.Next);
                 }
 
+                // fetch patient data from the list of patient ids
                 foreach (var patientId in patientIdList)
                 {
                     Bundle PatientResult = await Client.SearchByIdAsync<Hl7.Fhir.Model.Patient>(patientId);
 
                     if (PatientResult.Entry.Count > 0)
                     {
+                        // Map the FHIR Patient object to App's Patient object
                         Hl7.Fhir.Model.Patient fhirPatient = (Hl7.Fhir.Model.Patient)PatientResult.Entry[0].Resource;
                         PatientMapper mapper = new PatientMapper();
                         Models.Patient patient = mapper.Map(fhirPatient);
@@ -110,6 +128,11 @@ namespace FIT3077_Pre1975.Services
             return patientList;
         }
 
+        /// <summary>
+        /// Get Cholesterol values of a patients list
+        /// </summary>
+        /// <param name="patients"> given list of patients </param>
+        /// <returns> list of patients that contain Cholesterol values </returns>
         public static async Task<PatientsList> GetCholesterolValues(PatientsList patients)
         {
             PatientsList MonitoredPatientList = new PatientsList();
@@ -118,7 +141,7 @@ namespace FIT3077_Pre1975.Services
             {
                 try
                 {
-
+                    // sort by date, limit to 1 so only take the newest Cholesterol observation
                     var ObservationQuery = new SearchParams()
                             .Where("patient=" + MonitoredPatient.Id)
                             .Where("code=2093-3")
@@ -133,6 +156,7 @@ namespace FIT3077_Pre1975.Services
 
                     if (ObservationResult.Entry.Count > 0)
                     {
+                        // Map the FHIR Observation object to App's Observation object
                         Hl7.Fhir.Model.Observation fhirObservation = (Hl7.Fhir.Model.Observation)ObservationResult.Entry[0].Resource;
                         ObservationMapper mapper = new ObservationMapper();
                         Models.Observation cholesterolObservation = mapper.Map(fhirObservation);
@@ -154,6 +178,11 @@ namespace FIT3077_Pre1975.Services
             return MonitoredPatientList;
         }
 
+        /// <summary>
+        /// Get patient data for ML task
+        /// </summary>
+        /// <param name="patient"> given patient </param>
+        /// <returns> a patient contains observation values for ML task </returns>
         public static async Task<Models.Patient> GetDataForAnalysis(Models.Patient patient)
         {
             Models.Patient currentPatient = patient;
@@ -195,6 +224,10 @@ namespace FIT3077_Pre1975.Services
             return currentPatient;
         }
 
+        /// <summary>
+        /// Get Data for ML Task
+        /// </summary>
+        /// <returns>a list of patients contain observation data for ML task</returns>
         public static async Task<PatientsList> GetData()
         {
             int count = 0;
@@ -209,6 +242,7 @@ namespace FIT3077_Pre1975.Services
 
                 Bundle PatientResult = await Client.SearchAsync<Hl7.Fhir.Model.Patient>(PatientQuery);
 
+                // paging to search for all patient until reaching NUMBER_OF_DATA_RECORD value
                 while (PatientResult != null)
                 {
                     if (stop) break;
@@ -227,6 +261,7 @@ namespace FIT3077_Pre1975.Services
                                 .OrderBy("-date")
                                 .LimitTo(1);
 
+                            // Only GetData for patient that has Cholesterol value
                             Bundle CholesterolResult = await Client.SearchAsync<Hl7.Fhir.Model.Observation>(CholesterolQuery);
                             if (CholesterolResult.Entry.Count > 0)
                             {
@@ -235,6 +270,7 @@ namespace FIT3077_Pre1975.Services
                             }
                         }
 
+                        // Stop if count reachs NUMBER_OF_DATA_RECORD
                         if (count == NUMBER_OF_DATA_RECORD)
                         {
                             stop = true;
