@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
+    /// <summary>
+    /// Model an Observation of a Patient
+    /// </summary>
     public class Observation
     {
 

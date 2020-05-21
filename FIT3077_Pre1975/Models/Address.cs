@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Models
 {
+    /// <summary>
+    /// Models an address component
+    /// </summary>
     public class Address
     {
         public List<string> Line { get; set; }

@@ -10,6 +10,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FIT3077_Pre1975.Controllers
 {
+    /// <summary>
+    /// Controller class for Practitioner Views (Login and Details)
+    /// </summary>
     public class PractitionerController : Controller
     {
 
@@ -22,6 +25,11 @@ namespace FIT3077_Pre1975.Controllers
 
         // POST: /Practitioner/Login
         //
+        /// <summary>
+        /// Handle Login event from View
+        /// </summary>
+        /// <param name="model"> submitted Login Model </param>
+        /// <returns> Practitioner Detail View </returns>
         [HttpPost]
         public async Task<ActionResult> LoginAsync(LoginViewModel model)
         {
@@ -30,12 +38,15 @@ namespace FIT3077_Pre1975.Controllers
                 return View(model);
             }
 
+            // Get new Practitioner from input Id
             Practitioner newPractitioner;
             newPractitioner = await FhirService.GetPractitioner(model.Id);
             if (newPractitioner != null)
             {
                 AppContext.Practitioner = newPractitioner;
                 AppContext.MonitorPatients = new PatientsList();
+                
+                // Notify observers of Practitioner
                 AppContext.Practitioner.Notify();
                 return Redirect("/Practitioner/");
             }
@@ -46,7 +57,7 @@ namespace FIT3077_Pre1975.Controllers
             }
         }
 
-        // GET: /Practitioner/Detail
+        // GET: /Practitioner/
         //
         public IActionResult Index()
         {
