@@ -2,24 +2,33 @@
 
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js" type="text/javascript"></script>
 
+  @*<summary>
+        Function to highlight row with checked checkbox
+    </summary>*@
 <script>
     $(document).ready(function () {
-        $("#table123 input[type=checkbox]:checked").each(function () {
+        $("#mytable input[type=checkbox]:checked").each(function () {
             $(this).parent().parent().addClass("highlight");
         });
     });
 </script>
 
+  @*<summary>
+        Function to implement select all checkbox and each checkbox highlighting
+    </summary>*@
 <script>
     $(document).ready(function () {
-        $("#table123 th > input").click(function () {
+        $("#mytable th > input").click(function () {
+            /// select all
             if ($(this).is(":checked")) {
                 $(this).closest('table')
                     .find('td > :checkbox')
                     .attr('checked', $(this).is(':checked'))
                     .prop('checked', $(this).is(':checked'))
                     .parent().parent().addClass("highlight");
-            } else {
+            }
+            /// deselect all
+            else {
                 $(this).closest('table')
                     .find('td > :checkbox')
                     .attr('checked', $(this).is(':checked'))
@@ -29,26 +38,34 @@
             $(this).parent().parent().removeClass("highlight");
         });
 
-        $("#table123 td > input").click(function () {
+        /// individual selection
+        $("#mytable td > input").click(function () {
             if ($(this).is(":checked")) {
                 $(this).parent().parent().addClass("highlight");
             } else {
                 $(this).parent().parent().removeClass("highlight");
             }
         });
-        
+
     });
 </script>
 
+  @*<summary>
+        Button onclick function sends an ajax POST call to UpdateMonitor task in PatientList controller
+        with checked List IDs
+    </summary>*@
 <script>
     $(function () {
         $("#btnUpdate").click(function () {
+
+            /// get all checked patients' IDs
             var IdList = [];
-            $("#table123 input[type=checkbox]:checked").each(function () {
+            $("#mytable input[type=checkbox]:checked").each(function () {
                 var row = $(this).closest("tr")[0];
                 IdList.push(row.cells[2].innerHTML);
             });
 
+            /// send an ajax request with selected IDs
             $.ajax({
                 url: '@Url.Action("UpdateMonitor", "PatientList")',
                 data: { ListId: IdList },
@@ -64,12 +81,14 @@
     });
 </script>
 
+@*Update monitor list alert*@
 <div class="alert alert-success alert-dismissible">
     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
     <strong>Success!</strong> Monitor List is updated.
 </div>
 
-<table class="table" id="table123">
+@*Table of all patients*@
+<table class="table" id="mytable">
     <thead>
         <tr>
             <th scope="col"><input type="checkbox" id="checkall"></th>
@@ -84,7 +103,7 @@
             int count = 1;
             foreach (Patient patient in Model)
             {
-                // Create the list of these clients
+                /// get information about each patient to generate table
                 <tr>
                     <td><input type="checkbox" id="patient" +"@count" checked=@patient.Selected></td>
                     <td>@count</td>
@@ -96,14 +115,18 @@
         }
     </tbody>
 </table>
+
+@*Update monitor list button*@
 <div><button type="button" id="btnUpdate" class="btn btn-primary">Update Monitored Patients</button></div>
 
+@*Styling of highlighed rows*@
 <style>
     .highlight {
         color: #fff;
         background-color: #1b6ec2;
         border-color: #1861ac;
     }
+
     .alert {
         display: none;
     }
