@@ -18,7 +18,9 @@ namespace FIT3077_Pre1975.Mappings
             /// create a new Observation object and map values from Fhir model to it
             var observation = new Observation
             {
-                Id = element.Id
+                Id = element.Id,
+                Code = element.Code.Coding[0].Code,
+                CodeText = element.Code.Text
             };
 
             if (element.Issued != null)
@@ -29,10 +31,6 @@ namespace FIT3077_Pre1975.Mappings
             {
                 observation.Issued = null;
             }
-
-            observation.Code = element.Code.Coding[0].Code;
-
-            observation.CodeText = element.Code.Text;
 
             Hl7.Fhir.Model.Quantity fhirQuantity = (Hl7.Fhir.Model.Quantity)element.Value;
 

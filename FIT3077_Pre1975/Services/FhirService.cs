@@ -26,6 +26,10 @@ namespace FIT3077_Pre1975.Services
 
         private static readonly FhirClient Client = new FhirClient(SERVICE_ROOT_URL) { Timeout = SERVICE_TIMEOUT };
 
+        private const string CHOLESTEROL_CODE = "2093-3";
+
+        private const string BLOOD_PRESSURE_CODE = "55284-4";
+
         /// <summary>
         /// Get Practitioner by ID
         /// </summary>
@@ -127,11 +131,11 @@ namespace FIT3077_Pre1975.Services
         }
 
         /// <summary>
-        /// Get Cholesterol values of a patients list
+        /// Get Observation values of a patients list (Total Cholesterol, Blood Pressure)
         /// </summary>
         /// <param name="patients"> given list of patients </param>
-        /// <returns> list of patients that contain Cholesterol values </returns>
-        public static async Task<PatientsList> GetCholesterolValues(PatientsList patients)
+        /// <returns> list of patients that contain Cholesterol and Blood Pressure values </returns>
+        public static async Task<PatientsList> GetObservationValues(PatientsList patients)
         {
             PatientsList MonitoredPatientList = new PatientsList();
 
@@ -139,18 +143,19 @@ namespace FIT3077_Pre1975.Services
             {
                 try
                 {
-                    // sort by date, limit to 1 so only take the newest Cholesterol observation
-                    var ObservationQuery = new SearchParams()
-                            .Where("patient=" + MonitoredPatient.Id)
-                            .Where("code=2093-3")
-                            .OrderBy("-date")
-                            .LimitTo(1);
-
-                    Bundle ObservationResult = await Client.SearchAsync<Hl7.Fhir.Model.Observation>(ObservationQuery);
 
                     Models.Patient patient = MonitoredPatient;
                     patient.Observations = new List<Models.Observation>();
                     patient.HasObservations = true;
+
+                    // sort by date, limit to 1 so only take the newest Cholesterol observation
+                    var ObservationQuery = new SearchParams()
+                            .Where("patient=" + MonitoredPatient.Id)
+                            .Where("code=" + CHOLESTEROL_CODE)
+                            .OrderBy("-date")
+                            .LimitTo(1);
+
+                    Bundle ObservationResult = await Client.SearchAsync<Hl7.Fhir.Model.Observation>(ObservationQuery);
 
                     if (ObservationResult.Entry.Count > 0)
                     {
@@ -162,6 +167,45 @@ namespace FIT3077_Pre1975.Services
                         patient.Observations.Add(cholesterolObservation);
 
                     }
+
+                    // sort by date, limit to 5 so only take the lastest Blood Pressure observation
+                    ObservationQuery = new SearchParams()
+                            .Where("patient=" + MonitoredPatient.Id)
+                            .Where("code=" + BLOOD_PRESSURE_CODE)
+                            .OrderBy("-date")
+                            .LimitTo(5);
+
+                    ObservationResult = await Client.SearchAsync<Hl7.Fhir.Model.Observation>(ObservationQuery);
+
+                    for (int i = 0; i < ObservationResult.Entry.Count; i++)
+                    {
+                        // Map the FHIR Observation object to App's Observation object
+                        Hl7.Fhir.Model.Observation fhirObservation = (Hl7.Fhir.Model.Observation)ObservationResult.Entry[i].Resource;
+                        ComponentObservationMapper mapper = new ComponentObservationMapper();
+
+                        Models.Observation diastolicObservation = mapper.Map(fhirObservation.Component[0]);
+                        diastolicObservation.Subject = patient;
+                        diastolicObservation.Id = fhirObservation.Id;
+
+                        Models.Observation systolicObservation = mapper.Map(fhirObservation.Component[1]);
+                        systolicObservation.Subject = patient;
+                        systolicObservation.Id = fhirObservation.Id;
+
+                        if (fhirObservation.Issued != null)
+                        {
+                            diastolicObservation.Issued = ((DateTimeOffset)fhirObservation.Issued).DateTime;
+                            systolicObservation.Issued = ((DateTimeOffset)fhirObservation.Issued).DateTime;
+                        }
+                        else
+                        {
+                            diastolicObservation.Issued = null;
+                            systolicObservation.Issued = null;
+                        }
+
+                        patient.Observations.Add(diastolicObservation);
+                        patient.Observations.Add(systolicObservation);
+                    }
+
                     MonitoredPatientList.AddPatient(patient);
                 }
                 catch (FhirOperationException FhirException)
