@@ -97,7 +97,7 @@ namespace FIT3077_Pre1975.Controllers
             }
 
             // query list of patients haven't queried Cholesterol
-            PatientsList queriedPatients = await FhirService.GetCholesterolValues(queryPatients);
+            PatientsList queriedPatients = await FhirService.GetObservationValues(queryPatients);
             foreach (Patient patient in queriedPatients)
             {
                 newMonitorList.AddPatient(patient);
@@ -116,7 +116,7 @@ namespace FIT3077_Pre1975.Controllers
         /// <returns> Updated Monitor List </returns>
         public async Task<ActionResult> ResetMonitorList(List<string> ListId)
         {
-            PatientsList queriedPatients = await FhirService.GetCholesterolValues(AppContext.MonitorPatients);
+            PatientsList queriedPatients = await FhirService.GetObservationValues(AppContext.MonitorPatients);
             AppContext.MonitorPatients = queriedPatients;
             return View("Monitor");
         }

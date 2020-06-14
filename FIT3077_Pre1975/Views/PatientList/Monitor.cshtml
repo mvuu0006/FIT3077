@@ -94,7 +94,10 @@
                 <th scope="col">ID</th>
                 <th scope="col">Name</th>
                 <th scope="col">Total Cholesterol</th>
-                <th scope="col">Time of Issue</th>
+                <th scope="col">Time</th>
+                <th scope="col">Systolic Blood Pressure</th>
+                <th scope="col">Diastolic Blood Pressure</th>
+                <th scope="col">Time</th>
                 <th scope="col"></th>
                 <th scope="col"></th>
             </tr>
@@ -106,30 +109,44 @@
                 int count = 1;
                 foreach (Patient patient in Model)
                 {
-                    <tr id=@patient.Id>
-                        <td>@patient.Id</td>
-                        <td>@patient.Name</td>
-                        @if (patient.Observations.Count == 0)
-                        {
-                            <td>No Data</td>
-                            <td>No Data</td>
-                        }
-                        else
-                        {
-                            <td class="patientvalue">@patient.Observations[0].MeasurementResult.Value @patient.Observations[0].MeasurementResult.Unit</td>
-                            <td>@patient.Observations[0].Issued</td>
-                        }
+            <tr id=@patient.Id>
+                <td>@patient.Id</td>
+                <td>@patient.Name</td>
+                @if (!patient.ContainsObservation("Total Cholesterol"))
+                {
+                    <td>No Data</td>
+                    <td>No Data</td>
+                }
+                else
+                {
+                    Observation cholesterol = patient.GetObservationByCodeText("Total Cholesterol");
+                    <td class="patientvalue">@cholesterol.MeasurementResult.ToString()</td>
+                    <td>@cholesterol.Issued</td>
+                }
+                @if (!patient.ContainsObservation("Diastolic Blood Pressure"))
+                {
+                    <td>No Data</td>
+                    <td>No Data</td>
+                    <td>No Data</td>
+                }
+                else
+                {
+                    Observation diastolic = patient.GetObservationByCodeText("Diastolic Blood Pressure");
+                    Observation systolic = patient.GetObservationByCodeText("Systolic Blood Pressure");
+                    <td>@systolic.MeasurementResult.ToString()</td>
+                    <td>@diastolic.MeasurementResult.ToString()</td>
+                    <td>@systolic.Issued</td>
+                }
+                @*patient detail button*@
+                <td>
+                    <button href="javascript:void(0);" class="anchorDetail btn btn-link" data-id="@patient.Id">Details</button>
+                </td>
 
-                        @*patient detail button*@
-                        <td>
-                            <button href="javascript:void(0);" class="anchorDetail btn btn-link" data-id="@patient.Id">Details</button>
-                        </td>
-
-                        @*remove patient button*@
-                        <td>
-                            <button type="button" class="delete btn btn-danger" data-id="@patient.Id">Remove</button>
-                        </td>
-                    </tr>
+                @*remove patient button*@
+                <td>
+                    <button type="button" class="delete btn btn-danger" data-id="@patient.Id">Remove</button>
+                </td>
+            </tr>
 
                     count++;
                 }

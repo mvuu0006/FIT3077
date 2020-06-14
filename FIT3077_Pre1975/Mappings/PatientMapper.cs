@@ -16,11 +16,11 @@ namespace FIT3077_Pre1975.Mappings
         public override Models.Patient Map(Hl7.Fhir.Model.Patient element)
         {
             /// create a new Patient object and map values from Fhir model to it
-            var patient = new Models.Patient();
-
-            patient.Id = element.Id;
-
-            patient.Name = element.Name[0].ToString();
+            var patient = new Models.Patient
+            {
+                Id = element.Id,
+                Name = element.Name[0].ToString()
+            };
 
             if (element.BirthDateElement != null)
             {
