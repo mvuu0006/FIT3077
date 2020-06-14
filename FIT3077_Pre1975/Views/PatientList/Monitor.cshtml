@@ -4,19 +4,20 @@
 }
 
 @*<summary>
-        Monitored patients list view
-  </summary>*@
-
+          Monitored patients list view
+    </summary>*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js" type="text/javascript"></script>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.2.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-  @*<summary>
+@*<summary>
           Function to show modal popup with patient details at (.anchorDetail) elements
     </summary>*@
 <script>
-    var TeamDetailPostBackURL = 'ShowDetail';
+    var PatientDetailPostBackURL = 'ShowDetail';
 
     $(function () {
         $(".anchorDetail").click(function () {
@@ -28,7 +29,7 @@
             /// ajax GET call to get patient details with patient's ID
             $.ajax({
                 type: "GET",
-                url: TeamDetailPostBackURL,
+                url: PatientDetailPostBackURL,
                 contentType: "application/json; charset=utf-8",
                 data: { "Id": id },
                 datatype: "json",
@@ -53,7 +54,8 @@
 
 </script>
 
-  @*<summary>
+
+@*<summary>
           Function to compute average cholesterol and highlight rows
           of patients with above average cholesterol values.
     </summary>*@
@@ -86,8 +88,11 @@
 
 
 <div>
+    @*Button to show monitor list in a graph*@
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Show Graph</button>
+
     <h4>Monitored Patients</h4>
-    <hr />
+
     <table class="table" id="table">
         <thead>
             <tr>
@@ -109,44 +114,44 @@
                 int count = 1;
                 foreach (Patient patient in Model)
                 {
-            <tr id=@patient.Id>
-                <td>@patient.Id</td>
-                <td>@patient.Name</td>
-                @if (!patient.ContainsObservation("Total Cholesterol"))
-                {
-                    <td>No Data</td>
-                    <td>No Data</td>
-                }
-                else
-                {
-                    Observation cholesterol = patient.GetObservationByCodeText("Total Cholesterol");
-                    <td class="patientvalue">@cholesterol.MeasurementResult.ToString()</td>
-                    <td>@cholesterol.Issued</td>
-                }
-                @if (!patient.ContainsObservation("Diastolic Blood Pressure"))
-                {
-                    <td>No Data</td>
-                    <td>No Data</td>
-                    <td>No Data</td>
-                }
-                else
-                {
-                    Observation diastolic = patient.GetObservationByCodeText("Diastolic Blood Pressure");
-                    Observation systolic = patient.GetObservationByCodeText("Systolic Blood Pressure");
-                    <td>@systolic.MeasurementResult.ToString()</td>
-                    <td>@diastolic.MeasurementResult.ToString()</td>
-                    <td>@systolic.Issued</td>
-                }
-                @*patient detail button*@
-                <td>
-                    <button href="javascript:void(0);" class="anchorDetail btn btn-link" data-id="@patient.Id">Details</button>
-                </td>
+                    <tr id=@patient.Id>
+                        <td>@patient.Id</td>
+                        <td>@patient.Name</td>
+                        @if (!patient.ContainsObservation("Total Cholesterol"))
+                        {
+                            <td>No Data</td>
+                            <td>No Data</td>
+                        }
+                        else
+                        {
+                            Observation cholesterol = patient.GetObservationByCodeText("Total Cholesterol");
+                            <td class="patientvalue">@cholesterol.MeasurementResult.ToString()</td>
+                            <td>@cholesterol.Issued</td>
+                        }
+                        @if (!patient.ContainsObservation("Diastolic Blood Pressure"))
+                        {
+                            <td>No Data</td>
+                            <td>No Data</td>
+                            <td>No Data</td>
+                        }
+                        else
+                        {
+                            Observation diastolic = patient.GetObservationByCodeText("Diastolic Blood Pressure");
+                            Observation systolic = patient.GetObservationByCodeText("Systolic Blood Pressure");
+                            <td>@systolic.MeasurementResult.ToString()</td>
+                            <td>@diastolic.MeasurementResult.ToString()</td>
+                            <td>@systolic.Issued</td>
+                        }
+                        @*patient detail button*@
+                        <td>
+                            <button href="javascript:void(0);" class="anchorDetail btn btn-link" data-id="@patient.Id">Details</button>
+                        </td>
 
-                @*remove patient button*@
-                <td>
-                    <button type="button" class="delete btn btn-danger" data-id="@patient.Id">Remove</button>
-                </td>
-            </tr>
+                        @*remove patient button*@
+                        <td>
+                            <button type="button" class="delete btn btn-danger" data-id="@patient.Id">Remove</button>
+                        </td>
+                    </tr>
 
                     count++;
                 }
@@ -164,6 +169,86 @@
         </div>
     </div>
 
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Total cholesterol in mg/dL</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    
+                    <canvas id="chBar" width="400" height="400"></canvas>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('#exampleModal').on('shown.bs.modal', function (event) {
+            var graphLabel = [];
+            var graphData = [];
+            $('td').each(function () {
+                if ($(this).hasClass('patientvalue')) {
+                    var row = $(this).closest("tr")[0];
+                    graphLabel.push(row.cells[1].innerHTML);
+                    graphData.push(parseFloat(row.cells[2].innerHTML.split()[0]));                    
+                }
+            });
+            var colors = ['#007bff'];
+            var chBar = document.getElementById("chBar");
+            var chartData = {
+                labels: graphLabel,
+                datasets: [{
+                    data: graphData,
+                    backgroundColor: colors[0]
+                }]
+            };
+            if (graphData.length === 0) {
+                chartData.datasets = [];
+            }
+            if (chBar) {
+                new Chart(chBar, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                });
+            }
+            Chart.plugins.register({
+                afterDraw: function (chart) {
+                    if (chartData.datasets.length === 0) {
+                        // No data is present
+                        var ctx = chart.chart.ctx;
+                        var width = chart.chart.width;
+                        var height = chart.chart.height
+                        chart.clear();
+
+                        ctx.save();
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = "16px 'Helvetica Nueue'";
+                        ctx.fillText('No data to display', width / 2, height / 2);
+                        ctx.restore();
+                    }
+                }
+            });
+            
+        });
+    </script>
     @*Input form for setting update interval*@
     <div style="position:relative; left:15px" class="form-group row">
         <div class="col-xs-2">
@@ -213,7 +298,8 @@
 </script>
 
 
-  @*<summary>
+
+@*<summary>
           Function to implement a timer with customizable interval
     </summary>*@
 <script>
@@ -303,7 +389,7 @@
 @*Countdown timer div*@
 <p style="position:relative; top:20px" id="countdownTimer"></p>
 
-  @*<summary>
+@*<summary>
           Function to implement remove patient button and update view and appcontext data accordingly
     </summary>*@
 <script>
@@ -324,3 +410,4 @@
     }
     });
 </script>
+
