@@ -169,17 +169,16 @@
         </div>
     </div>
 
+    @*Modal popup to show graph*@
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myModalLabel">Total cholesterol in mg/dL</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>
                 <div class="modal-body">
-                    
-                    <canvas id="chBar" width="400" height="400"></canvas>
-                    
+                    <canvas id="chBar" style="width: 512px; height: 256px"></canvas>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -195,16 +194,16 @@
                 if ($(this).hasClass('patientvalue')) {
                     var row = $(this).closest("tr")[0];
                     graphLabel.push(row.cells[1].innerHTML);
-                    graphData.push(parseFloat(row.cells[2].innerHTML.split()[0]));                    
+                    graphData.push(parseFloat(row.cells[2].innerHTML.split()[0]));
                 }
             });
-            var colors = ['#007bff'];
+
             var chBar = document.getElementById("chBar");
             var chartData = {
                 labels: graphLabel,
                 datasets: [{
                     data: graphData,
-                    backgroundColor: colors[0]
+                    backgroundColor: '#007bff'
                 }]
             };
             if (graphData.length === 0) {
@@ -214,13 +213,18 @@
                 new Chart(chBar, {
                     type: 'bar',
                     data: chartData,
+                    
                     options: {
                         scales: {
                             yAxes: [{
                                 ticks: {
                                     beginAtZero: true
                                 }
-                            }]
+                            }],
+                            xAxes: [{
+                                barPercentage: 0.3,
+                                maxBarThickness: 45
+                            }],
                         },
                         legend: {
                             display: false
@@ -246,7 +250,7 @@
                     }
                 }
             });
-            
+
         });
     </script>
     @*Input form for setting update interval*@
@@ -267,6 +271,7 @@
         color: red;
         border-color: #1861ac;
     }
+    
 </style>
 
 
