@@ -88,11 +88,14 @@
 
 
 <div>
+    <h4>Monitored Patients</h4>
+    <hr />
     @*Button to show monitor list in a graph*@
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Show Graph</button>
-
-    <h4>Monitored Patients</h4>
-
+    <button onclick="location.href='@Url.ActionLink("HistoricalMonitor", "PatientList")'" type="button" class="btn btn-primary">
+        Historical Monitor
+    </button>
+    <hr />
     <table class="table" id="table">
         <thead>
             <tr>
@@ -177,9 +180,9 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>
                 <div class="modal-body">
-                    
+
                     <canvas id="chBar" width="400" height="400"></canvas>
-                    
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -195,7 +198,7 @@
                 if ($(this).hasClass('patientvalue')) {
                     var row = $(this).closest("tr")[0];
                     graphLabel.push(row.cells[1].innerHTML);
-                    graphData.push(parseFloat(row.cells[2].innerHTML.split()[0]));                    
+                    graphData.push(parseFloat(row.cells[2].innerHTML.split()[0]));
                 }
             });
             var colors = ['#007bff'];
@@ -246,7 +249,7 @@
                     }
                 }
             });
-            
+
         });
     </script>
     @*Input form for setting update interval*@

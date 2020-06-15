@@ -163,7 +163,6 @@ namespace FIT3077_Pre1975.Services
                         Hl7.Fhir.Model.Observation fhirObservation = (Hl7.Fhir.Model.Observation)ObservationResult.Entry[0].Resource;
                         ObservationMapper mapper = new ObservationMapper();
                         Models.Observation cholesterolObservation = mapper.Map(fhirObservation);
-                        cholesterolObservation.Subject = patient;
                         patient.Observations.Add(cholesterolObservation);
 
                     }
@@ -184,11 +183,9 @@ namespace FIT3077_Pre1975.Services
                         ComponentObservationMapper mapper = new ComponentObservationMapper();
 
                         Models.Observation diastolicObservation = mapper.Map(fhirObservation.Component[0]);
-                        diastolicObservation.Subject = patient;
                         diastolicObservation.Id = fhirObservation.Id;
 
                         Models.Observation systolicObservation = mapper.Map(fhirObservation.Component[1]);
-                        systolicObservation.Subject = patient;
                         systolicObservation.Id = fhirObservation.Id;
 
                         if (fhirObservation.Issued != null)
@@ -248,7 +245,6 @@ namespace FIT3077_Pre1975.Services
                         Models.Observation observation = mapper.Map(fhirObservation);
                         if (!currentPatient.ContainsObservation(observation.CodeText))
                         {
-                            observation.Subject = currentPatient;
                             currentPatient.Observations.Add(observation);
                         }
                     }

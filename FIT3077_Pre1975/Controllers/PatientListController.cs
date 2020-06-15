@@ -13,7 +13,7 @@ namespace FIT3077_Pre1975.Controllers
     public class PatientListController : Controller
     {
 
-        // GET: /Practitioner/Detail
+        // GET: /PatientList/
         //
         public IActionResult Index()
         {
@@ -62,6 +62,28 @@ namespace FIT3077_Pre1975.Controllers
                 return View(AppContext.MonitorPatients);
             }
         }
+
+        /// <summary>
+        /// Get HistoricalMonitor view
+        /// </summary>
+        /// <returns> monitor list view </returns>
+        public ActionResult HistoricalMonitor()
+        {
+            while (AppContext.MonitorPatients.IsLoading == true)
+            {
+                Thread.Sleep(200);
+            }
+            List<Tracker> trackers = new List<Tracker>();
+            foreach (Patient patient in AppContext.MonitorPatients)
+            {
+                if (patient.ContainsObservation("Systolic Blood Pressure"))
+                {
+                    trackers.Add(new Tracker(patient, "Systolic Blood Pressure"));
+                }
+            }
+            return View(trackers);
+        }
+
         /// <summary>
         /// Handle Update Monitor event from Patient List View
         /// </summary>
@@ -162,6 +184,7 @@ namespace FIT3077_Pre1975.Controllers
         {
             return Json(AppContext.Interval);
         }
+
     } 
 }
 

@@ -1,0 +1,21 @@
+﻿@model IEnumerable<FIT3077_Pre1975.Models.Tracker>
+
+@{
+    ViewData["Title"] = "Historical Monitor";
+}
+
+<h4>Historical Monitor</h4>
+<hr />
+<div class="list-group">
+    @foreach (var item in Model)
+    {
+    <a class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">@item.Patient.Name</h5>
+        </div>
+        <p class="mb-1">
+            @item.ToString()
+        </p>
+    </a>
+    }
+</div>

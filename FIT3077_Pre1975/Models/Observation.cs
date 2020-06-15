@@ -11,8 +11,6 @@ namespace FIT3077_Pre1975.Models
 
         public string Id { get; set; }
 
-        public Patient Subject { get; set; }
-
         [Display(Name = "Date of Issue")]
         public DateTime? Issued { get; set; }
 
@@ -21,5 +19,10 @@ namespace FIT3077_Pre1975.Models
         public string CodeText { get; set; }
 
         public Measurement MeasurementResult { get; set; }
+
+        public override string ToString()
+        {
+            return this.MeasurementResult.ToString() + "(" + Issued.ToString() + ")";
+        }
     }
 }
