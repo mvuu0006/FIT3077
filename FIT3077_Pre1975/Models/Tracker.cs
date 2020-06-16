@@ -7,7 +7,9 @@ namespace FIT3077_Pre1975.Models
 {
     public class Tracker
     {
-        public List<Observation> Observations;
+        public List<Observation> Observations { get; set; }
+
+        public List<decimal> GraphData { get; set; }
 
         public Patient Patient { get; set; }
 
@@ -23,6 +25,11 @@ namespace FIT3077_Pre1975.Models
                 if (x.Issued == null || y.Issued == null) return 1;
                 return ((DateTime)x.Issued).CompareTo((DateTime)y.Issued);
             });
+            this.GraphData = new List<decimal>();
+            foreach (Observation observation in Observations)
+            {
+                GraphData.Add((decimal)observation.MeasurementResult.Value);
+            }
         }
 
         public override string ToString()
