@@ -50,5 +50,18 @@ namespace FIT3077_Pre1975.Models
             }
             return null;
         }
+
+        public List<Observation> GetAllObservationsByCodeText(string Text)
+        {
+            List<Observation> observations = new List<Observation>();
+            foreach (Observation observation in Observations)
+            {
+                if (observation.CodeText.Equals(Text))
+                {
+                    observations.Add(observation);
+                }
+            }
+            return observations;
+        }
     }
 }
