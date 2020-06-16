@@ -25,7 +25,7 @@
 </head>
 
 <div>
-    <div class="container">
+    <div>
         <div class="row">
             <div class="col-sm">
                 <h4>Historical Monitor</h4>
@@ -49,6 +49,8 @@
             </a>
         }
     </div>
+    <hr />
+    <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Monitor", "PatientList")'">Back</button>
 
     <div class="modal fade" id="graphModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">

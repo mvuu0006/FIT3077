@@ -184,7 +184,19 @@ namespace FIT3077_Pre1975.Controllers
         {
             return Json(AppContext.Interval);
         }
+        public EmptyResult SetThreshold(int newSystolicThreshold, int newDiastolicThreshold)
+        {
+            AppContext.SystolicThreshold = newSystolicThreshold;
+            AppContext.DiastolicThreshold = newDiastolicThreshold;
+            AppContext.BPThresholds[0] = newSystolicThreshold;
+            AppContext.BPThresholds[1] = newDiastolicThreshold;
+            return new EmptyResult();
+        }
 
+        public JsonResult GetThreshold()
+        {
+            return Json(AppContext.BPThresholds);
+        }
     } 
 }
 

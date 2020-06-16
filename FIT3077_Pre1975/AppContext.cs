@@ -42,7 +42,12 @@ namespace FIT3077_Pre1975
                 _practitioner.Attach(Patients);
             }
         }
-
         internal static int Interval { get; set; } = 15; //default value for Interval
-    }
+
+        internal static int SystolicThreshold { get; set; } = 100;    //default value for x
+
+        internal static int DiastolicThreshold { get; set; } = 70;    //default value for y
+
+        internal static List<int> BPThresholds { get; set; } = new List<int>() { SystolicThreshold, DiastolicThreshold };
+    }   
 }
