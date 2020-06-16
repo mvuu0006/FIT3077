@@ -11,7 +11,6 @@
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.2.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 @*<summary>
           Function to show modal popup with patient details at (.anchorDetail) elements
@@ -79,7 +78,7 @@
             if ($(this).hasClass('patientvalue')) {
                 var row = $(this).closest("tr")[0];
                 if (parseFloat(row.cells[2].innerHTML.split()[0]) > average) {
-                    row.classList.add("highlight");
+                    row.cells[2].classList.add("highlight");
                 }
             }
         });
@@ -144,8 +143,8 @@
                         {
                             Observation diastolic = patient.GetObservationByCodeText("Diastolic Blood Pressure");
                             Observation systolic = patient.GetObservationByCodeText("Systolic Blood Pressure");
-                            <td class="bloodPressure">@systolic.MeasurementResult.ToString()</td>
-                            <td class="bloodPressure">@diastolic.MeasurementResult.ToString()</td>
+                            <td class="bloodPressure systolicValue">@systolic.MeasurementResult.ToString()</td>
+                            <td class="bloodPressure diastolicValue">@diastolic.MeasurementResult.ToString()</td>
                             <td class="bloodPressure">@systolic.Issued</td>
                         }
                         @*patient detail button*@
@@ -192,6 +191,8 @@
             </div>
         </div>
     </div>
+
+    @*Chart render with Chart.js*@
     <script>
         $('#exampleModal').on('shown.bs.modal', function (event) {
             var graphLabel = [];
@@ -259,23 +260,43 @@
 
         });
     </script>
-    @*Input form for setting update interval*@
-    <div style="position:relative; left:15px" class="form-group row">
-        <div class="col-xs-2">
-            <input type="text" id="interval" class="form-control" data-content="15">
+    <form class="form-row">
+        <div class="form-group col-md-4">
+            <input type="text" class="form-control" id="interval" placeholder="Update interval">
         </div>
-        <div class="input-group-append">
+        <div class="form-group">
             <button class="btn btn-primary" type="button" id="reset">Submit</button>
         </div>
-    </div>
-    <small style="position:relative; top:-10px; left:10px" id="help" class="form-text text-muted">Set update interval (seconds).</small>
+    </form>
+    <small style="position:relative; top:-15px; left:12px" id="help" class="form-text text-muted">Set update interval (seconds).</small>
+    <form class="form-row">
+        <div class="form-group col-md-2">
+            <input class="form-control" type="text" id="newSystolic" placeholder="Systolic threshold">
+        </div>
+        <div class="form-group col-md-2">
+            <input class="form-control" type="text" id="newDiastolic" placeholder="Diastolic threshold">
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary" type="button" id="resetThreshold">Submit</button>
+        </div>
+    </form>
+    <small style="position:relative; top:-15px; left:12px" id="help" class="form-text text-muted">Set blood pressure thresholds (mm[Hg]).</small>
+    <small style="position:relative; top:-15px; left:12px" id="currentThreshold" class="form-text text-muted"></small>
 </div>
 
-@*Red font css for rows of patients with above avergage cholesterol values*@
+
 <style>
+    @*Red font for patients with above avergage cholesterol values*@ 
     .highlight {
         color: red;
         border-color: #1861ac;
+        font-weight: bold;
+    }
+    @*Purple for BP values higher than threshold*@
+    .bloodPressureHighlight {
+        color: purple;
+        border-color: #1861ac;
+        font-weight: bold;
     }
 </style>
 
@@ -284,7 +305,6 @@
           Function to update all patients' details every interval
     </summary>*@
 <script type="text/javascript">
-
     function Update() {
         var IdList = [];
 
@@ -304,10 +324,7 @@
             traditional: true,
         });
     }
-
 </script>
-
-
 
 @*<summary>
           Function to implement a timer with customizable interval
@@ -349,18 +366,18 @@
         data: {},
         traditional: true,
         success: function (result) {
-            callback(result);
+            callbackInterval(result);
         }
     });
 
     /// Generate view elements (countdown timer, reset listener) with interval data
-    function callback(data) {
+    function callbackInterval(data) {
         countdown = data;
         document.getElementById("interval").dataset.content = toString(countdown);
 
         /// countdown timer to update data
         var timer = new Timer(function () {
-            document.getElementById("countdownTimer").innerHTML = "Data update after: " + countdown + " seconds.";
+            document.getElementById("countdownTimer").innerHTML = "Data updates after: " + countdown + " seconds.";
             countdown -= 1;
             if (countdown < 0) {
                 Update();
@@ -421,8 +438,9 @@
     });
 </script>
 
-
-<script src="scripts/jquery-1.11.1.min.js"></script>
+@*<summary>
+          Function to implement dynamically toggled observations
+ </summary>*@
 <script>
     $(function () {
         var $chk = $("#grpChkBox input:checkbox"); // cache the selector
@@ -435,4 +453,84 @@
             $(colToHide).toggle();
         });
     });
+</script>
+
+@*<summary>
+          Function to highlight systolic and diastolic values according to x and y
+ </summary>*@
+<script>
+    $.ajax({
+        url: '@Url.Action("GetThreshold", "PatientList")',
+        dataType: "json",
+        data: {},
+        traditional: true,
+        success: function (result) {
+            callback(result);
+        }
+    });
+
+    /// Highlight BP values with data from AppContext
+    function callback(data) {
+        systolicValue = data[0];
+        diastolicValue = data[1];
+        var currentVal = document.getElementById("currentThreshold");
+        currentVal.innerHTML = "Current thresholds: Systolic: " + systolicValue + " mm[Hg], " + "Diastolic: " + diastolicValue + " mm[Hg]."
+        $("td").each(function () {
+            /// Checking all systolic values to highlight
+            if ($(this).hasClass('systolicValue')) {
+                var row = $(this).closest("tr")[0];               
+                if (parseFloat(row.cells[4].innerHTML.split()[0]) > systolicValue) {
+                    row.cells[4].classList.add("bloodPressureHighlight");
+                }
+            }
+            /// Checking all diastolic values to highlight
+            if ($(this).hasClass('diastolicValue')) {
+                var row = $(this).closest("tr")[0];
+                if (parseFloat(row.cells[5].innerHTML.split()[0]) > diastolicValue) {
+                    row.cells[5].classList.add("bloodPressureHighlight");
+                }
+            }
+        });
+
+        /// Set AppContext data with input value
+        document.getElementById("resetThreshold").addEventListener("click", function (e) {
+            var newSystolicThreshold = parseInt(document.getElementById("newSystolic").value);
+            var newDiastolicThreshold = parseInt(document.getElementById("newDiastolic").value);
+
+            /// check for appropiate new input
+            if (isNaN(newSystolicThreshold) || !(Number.isInteger(newSystolicThreshold)) || (newSystolicThreshold < 0) || isNaN(newDiastolicThreshold) || !(Number.isInteger(newDiastolicThreshold)) || (newDiastolicThreshold < 0)) {
+                alert("Blood pressure thresholds should be positive integers.");
+            }
+
+            else {
+                /// update new thresholds to AppContext
+                $.ajax({
+                    url: '@Url.Action("SetThreshold", "PatientList")',
+                    data: { newSystolicThreshold: document.getElementById("newSystolic").value, newDiastolicThreshold: document.getElementById("newDiastolic").value },
+                    dataType: "json",
+                    type: 'POST',
+                    traditional: true,
+                });
+                var currentVal = document.getElementById("currentThreshold");
+                currentVal.innerHTML = "Current thresholds: Systolic: " + newSystolicThreshold + " mm[Hg], " + "Diastolic: " + newDiastolicThreshold + " mm[Hg]."
+                /// Recheck all sytolic and diastolic values to highlight
+                $("td").each(function () {
+                    if ($(this).hasClass('systolicValue')) {
+                        var row = $(this).closest("tr")[0];
+                        row.cells[4].classList.remove("bloodPressureHighlight");
+                        if (parseFloat(row.cells[4].innerHTML.split()[0]) > newSystolicThreshold) {
+                            row.cells[4].classList.add("bloodPressureHighlight");
+                        }
+                    }
+                    if ($(this).hasClass('diastolicValue')) {
+                        var row = $(this).closest("tr")[0];
+                        row.cells[5].classList.remove("bloodPressureHighlight");
+                        if (parseFloat(row.cells[5].innerHTML.split()[0]) > newDiastolicThreshold) {
+                            row.cells[5].classList.add("bloodPressureHighlight");
+                        }
+                    }
+                });
+            }
+        });
+    }
 </script>
