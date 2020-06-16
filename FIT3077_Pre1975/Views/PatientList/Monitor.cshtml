@@ -92,17 +92,23 @@
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Show Graph</button>
 
     <h4>Monitored Patients</h4>
+    <div>
+        Select Checkbox to toggle corresponding Observations
+        <div id="grpChkBox">
+            <p><input type="checkbox" name="totalChol" /> Total cholesterol <input type="checkbox" name="bloodPressure" /> Blood pressure</p>
+        </div>
+    </div>
 
     <table class="table" id="table">
         <thead>
             <tr>
                 <th scope="col">ID</th>
                 <th scope="col">Name</th>
-                <th scope="col">Total Cholesterol</th>
-                <th scope="col">Time</th>
-                <th scope="col">Systolic Blood Pressure</th>
-                <th scope="col">Diastolic Blood Pressure</th>
-                <th scope="col">Time</th>
+                <th class="totalChol" scope="col">Total Cholesterol</th>
+                <th class="totalChol" scope="col">Time</th>
+                <th class="bloodPressure" scope="col">Systolic Blood Pressure</th>
+                <th class="bloodPressure" scope="col">Diastolic Blood Pressure</th>
+                <th class="bloodPressure" scope="col">Time</th>
                 <th scope="col"></th>
                 <th scope="col"></th>
             </tr>
@@ -119,28 +125,28 @@
                         <td>@patient.Name</td>
                         @if (!patient.ContainsObservation("Total Cholesterol"))
                         {
-                            <td>No Data</td>
-                            <td>No Data</td>
+                            <td class="totalChol">No Data</td>
+                            <td class="totalChol">No Data</td>
                         }
                         else
                         {
                             Observation cholesterol = patient.GetObservationByCodeText("Total Cholesterol");
-                            <td class="patientvalue">@cholesterol.MeasurementResult.ToString()</td>
-                            <td>@cholesterol.Issued</td>
+                            <td class="patientvalue totalChol">@cholesterol.MeasurementResult.ToString()</td>
+                            <td class="totalChol">@cholesterol.Issued</td>
                         }
                         @if (!patient.ContainsObservation("Diastolic Blood Pressure"))
                         {
-                            <td>No Data</td>
-                            <td>No Data</td>
-                            <td>No Data</td>
+                            <td class="bloodPressure">No Data</td>
+                            <td class="bloodPressure">No Data</td>
+                            <td class="bloodPressure">No Data</td>
                         }
                         else
                         {
                             Observation diastolic = patient.GetObservationByCodeText("Diastolic Blood Pressure");
                             Observation systolic = patient.GetObservationByCodeText("Systolic Blood Pressure");
-                            <td>@systolic.MeasurementResult.ToString()</td>
-                            <td>@diastolic.MeasurementResult.ToString()</td>
-                            <td>@systolic.Issued</td>
+                            <td class="bloodPressure">@systolic.MeasurementResult.ToString()</td>
+                            <td class="bloodPressure">@diastolic.MeasurementResult.ToString()</td>
+                            <td class="bloodPressure">@systolic.Issued</td>
                         }
                         @*patient detail button*@
                         <td>
@@ -213,7 +219,7 @@
                 new Chart(chBar, {
                     type: 'bar',
                     data: chartData,
-                    
+
                     options: {
                         scales: {
                             yAxes: [{
@@ -271,7 +277,6 @@
         color: red;
         border-color: #1861ac;
     }
-    
 </style>
 
 
@@ -416,3 +421,31 @@
     });
 </script>
 
+
+<script src="scripts/jquery-1.11.1.min.js"></script>
+<script>
+    //$(function () {
+        //var $chk = $("#grpChkBox input:checkbox");
+        //var $tbl = $("#table");
+        //var $tblhead = $("#table th");
+
+        //$chk.prop('checked', true);
+
+        //$chk.click(function () {
+            //var colToHide = $tblhead.filter("." + $(this).attr("name"));
+            //var index = $(colToHide).index();
+            //$tbl.find('tr :nth-child(' + (index + 1) + ')').toggle();
+        //});
+    //});
+    $(function () {
+        var $chk = $("#grpChkBox input:checkbox"); // cache the selector
+        var $tbl = $("#table");
+
+        $chk.prop('checked', true); // check all checkboxes when page loads
+
+        $chk.click(function () {
+            var colToHide = $tbl.find("." + $(this).attr("name"));
+            $(colToHide).toggle();
+        });
+    });
+</script>
