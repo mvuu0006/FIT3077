@@ -5,6 +5,7 @@
 }
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+<script src="~/js/update.js" type="text/javascript"></script>
 
 <head>
     <style>
@@ -28,7 +29,7 @@
     <div>
         <div class="row">
             <div class="col-sm">
-                <h4>Historical Monitor</h4>
+                <h4 id="view-name">Historical Monitor</h4>
             </div>
             <div class="col-sm">
                 <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#graphModal">Show Graph</button>
@@ -64,6 +65,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <span id="graphTimer"></span>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -72,6 +74,7 @@
     <script>
         $(document).ready(function () {
             $(document).on('shown.bs.modal', '#graphModal', function () {
+                charts = [];
                 var models = @Json.Serialize(Model);
                 $('#graphContainer').empty();
                 var container = document.querySelector('#graphContainer');
@@ -89,10 +92,10 @@
                     for (var i = 1; i <= tracker.observations.length; i++) {
                         labels.push(i);
                     }
-
                     var ctx = canvas.getContext('2d');
                     var config = createGraph(tracker.patient.name, labels, tracker.graphData);
-                    new Chart(ctx, config);
+                    chart = new Chart(ctx, config);
+                    charts.push(chart);
                 });
             });
         });
@@ -150,4 +153,7 @@
             };
         }
     </script>
+
+    @*Countdown timer div*@
+    <p style="position:relative; top:20px" id="countdownTimer"></p>
 </div>
