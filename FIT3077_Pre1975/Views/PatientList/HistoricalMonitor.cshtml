@@ -72,6 +72,9 @@
         </div>
     </div>
     <script>
+        /*
+        Add Line Graphs representing historical blood pressure value of monitored patients to the Modal pop-up
+        */
         $(document).ready(function () {
             $(document).on('shown.bs.modal', '#graphModal', function () {
                 charts = [];
@@ -93,6 +96,7 @@
                         labels.push(i);
                     }
                     var ctx = canvas.getContext('2d');
+                    // create a line graph from patient name and data
                     var config = createGraph(tracker.patient.name, labels, tracker.graphData);
                     chart = new Chart(ctx, config);
                     charts.push(chart);
@@ -110,7 +114,8 @@
             purple: 'rgb(153, 102, 255)',
             grey: 'rgb(231,233,237)'
         };
-
+        // create a line graph with title, x-axis labels and data
+        // using Chartjs
         function createGraph(name, labels, data) {
             return {
                 type: 'line',

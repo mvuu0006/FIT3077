@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace FIT3077_Pre1975.Mappings
 {
+    /// <summary>
+    /// Concrete Mapper class to map Fhir model component observation into Observation object
+    /// </summary>
     public class ComponentObservationMapper : MapperBase<Models.Observation, Hl7.Fhir.Model.Observation.ComponentComponent>
     {
+        /// <summary>
+        /// Method to map a Fhir Model component observation element to an Observation object
+        /// </summary>
+        /// <param name="element"> Component Observation element from Fhir model </param>
+        /// <returns> An Observation object with values from Fhir model element </returns>
         public override Models.Observation Map(Hl7.Fhir.Model.Observation.ComponentComponent element)
         {
             /// create a new Observation object and map values from Fhir model to it

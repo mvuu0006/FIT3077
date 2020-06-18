@@ -7,6 +7,9 @@ namespace FIT3077_Pre1975.Models
 {
     public class Tracker
     {
+        /// <summary>
+        /// Model a Tracker for Historical Monitoring
+        /// </summary>
         public List<Observation> Observations { get; set; }
 
         public List<decimal> GraphData { get; set; }
