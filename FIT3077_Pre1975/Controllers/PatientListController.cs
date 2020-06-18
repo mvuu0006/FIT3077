@@ -187,6 +187,13 @@ namespace FIT3077_Pre1975.Controllers
         {
             return Json(AppContext.Interval);
         }
+
+        /// <summary>
+        /// Set the threshold of blood pressure values to highlight
+        /// </summary>
+        /// <param name="newSystolicThreshold">new systolic BP threshold</param>
+        /// <param name="newDiastolicThreshold">new diastolic BP threshold</param>
+        /// <returns></returns>
         public IActionResult SetThreshold(int newSystolicThreshold, int newDiastolicThreshold)
         {
             AppContext.SystolicThreshold = newSystolicThreshold;
@@ -196,11 +203,20 @@ namespace FIT3077_Pre1975.Controllers
             return Json("Success");
         }
 
+        /// <summary>
+        /// Get the current BP systolic and diastolic thresholds in Json format
+        /// </summary>
+        /// <returns></returns>
         public JsonResult GetThreshold()
         {
             return Json(AppContext.BPThresholds);
         }
 
+        /// <summary>
+        /// Get labels and data from AppContext in Json format
+        /// </summary>
+        /// <param name="ViewName">name of the view with the graph</param>
+        /// <returns></returns>
         public JsonResult UpdateGraphData(string ViewName)
         {
             if (ViewName.Equals(MONITOR_VIEW_TITLE))
