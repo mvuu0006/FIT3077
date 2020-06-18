@@ -141,7 +141,7 @@ namespace FIT3077_Pre1975.Controllers
         {
             PatientsList queriedPatients = await FhirService.GetObservationValues(AppContext.MonitorPatients);
             AppContext.MonitorPatients = queriedPatients;
-            return Redirect("/PatientList/Monitor");
+            return Json("Success");
         }
 
         // <summary>
@@ -208,6 +208,28 @@ namespace FIT3077_Pre1975.Controllers
         public JsonResult GetThreshold()
         {
             return Json(AppContext.BPThresholds);
+        }
+
+        public JsonResult UpdateGraphData()
+        {
+            List<string> labels = new List<string>();
+            List<string> data = new List<string>();
+            
+            foreach (Patient patient in AppContext.MonitorPatients) {
+                if (patient.HasObservations)
+                {
+                    labels.Add(patient.Name);
+                    data.Add(patient.Observations[0].MeasurementResult.Value.ToString());
+                }
+            }
+
+            Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>
+            {
+                { "labels", labels },
+                { "data", data }
+            };
+
+            return Json(dict);
         }
     } 
 }
