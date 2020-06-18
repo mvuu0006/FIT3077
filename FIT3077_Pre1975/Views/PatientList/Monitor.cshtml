@@ -4,8 +4,8 @@
 }
 
 @*<summary>
-          Monitored patients list view
-</summary>*@
+              Monitored patients list view
+    </summary>*@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js" type="text/javascript"></script>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.10.2.min.js"></script>
@@ -203,7 +203,8 @@
                     <canvas id="chBar" style="width: 512px; height: 256px"></canvas>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <span id="graphTimer"></span>
+                    <button type="button" id="closeButton" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -221,7 +222,6 @@
                     graphData.push(parseFloat(row.cells[2].innerHTML.split()[0]));
                 }
             });
-
             var chBar = document.getElementById("chBar");
             var chartData = {
                 labels: graphLabel,
@@ -234,10 +234,9 @@
                 chartData.datasets = [];
             }
             if (chBar) {
-                new Chart(chBar, {
+                chart = new Chart(chBar, {
                     type: 'bar',
                     data: chartData,
-
                     options: {
                         scales: {
                             yAxes: [{
@@ -264,7 +263,6 @@
                         var width = chart.chart.width;
                         var height = chart.chart.height
                         chart.clear();
-
                         ctx.save();
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
@@ -274,7 +272,6 @@
                     }
                 }
             });
-
         });
     </script>
     <form class="form-row">
@@ -303,7 +300,7 @@
 
 
 <style>
-    @*Red font for patients with above avergage cholesterol values*@ 
+    @*Red font for patients with above avergage cholesterol values*@
     .highlight {
         color: red;
         border-color: #1861ac;
@@ -323,23 +320,52 @@
     </summary>*@
 <script type="text/javascript">
     function Update() {
-        var IdList = [];
-
-        /// get all the patients' IDs
-        $('td').each(function () {
-            if ($(this).hasClass('anchorDetail')) {
-                IdList.push($(this).attr('data-id'));
-            }
-        });
-
         /// ajax request to update patients' details and update view accordingly
         $.ajax({
             url: '@Url.Action("ResetMonitorList", "PatientList")',
-            data: { ListId: IdList },
             dataType: "json",
             type: 'POST',
             traditional: true,
         });
+    }
+</script>
+
+@*<summary>
+          Function to update graph details every interval
+    </summary>*@
+<script type="text/javascript">
+    function UpdateGraph() {
+
+        $.ajax({
+            url: '@Url.Action("ResetMonitorList", "PatientList")',
+            type: 'POST',
+            traditional: true,
+            success: function () {
+                UpdateSuccess();
+            }
+        });
+
+        function UpdateSuccess() {
+
+            $.ajax({
+                url: '@Url.Action("UpdateGraphData", "PatientList")',
+                dataType: "json",
+                data: {},
+                type: 'GET',
+                traditional: true,
+                success: function (result) {
+                    GraphCallback(result);
+                }
+            });
+            function GraphCallback(result) {
+                if (chart.data.datasets.length > 0) {
+                    chart.data.labels = result["labels"];
+                    chart.data.datasets[0].data = result["data"];
+                    chart.update();
+                }
+            }
+        }
+
     }
 </script>
 
@@ -395,9 +421,15 @@
         /// countdown timer to update data
         var timer = new Timer(function () {
             document.getElementById("countdownTimer").innerHTML = "Data updates after: " + countdown + " seconds.";
+            document.getElementById("graphTimer").innerHTML = "Data updates after: " + countdown + " seconds.";
             countdown -= 1;
             if (countdown < 0) {
-                Update();
+                if ($('#exampleModal').hasClass('show')) {
+                    UpdateGraph();
+                }
+                else {
+                    Update();
+                }
                 countdown = data;
             }
         }, 1000);
@@ -413,10 +445,6 @@
             }
 
             else {
-                countdown = newInterval;
-                document.getElementById("interval").dataset.content = document.getElementById("interval").value;
-                timer.reset(1000);
-
                 /// update new interval to AppContext
                 $.ajax({
                     url: '@Url.Action("SetUpdateInterval", "PatientList")',
@@ -425,6 +453,11 @@
                     type: 'POST',
                     traditional: true,
                 });
+
+                countdown = newInterval;
+                data = newInterval;
+                document.getElementById("interval").dataset.content = document.getElementById("interval").value;
+                timer.reset(1000);
             }
         });
     }
@@ -456,8 +489,8 @@
 </script>
 
 @*<summary>
-          Function to implement dynamically toggled observations
- </summary>*@
+             Function to implement dynamically toggled observations
+    </summary>*@
 <script>
     $(function () {
         var $chk = $("#grpChkBox input:checkbox"); // cache the selector
@@ -473,8 +506,8 @@
 </script>
 
 @*<summary>
-          Function to highlight systolic and diastolic values according to x and y
- </summary>*@
+             Function to highlight systolic and diastolic values according to x and y
+    </summary>*@
 <script>
     $.ajax({
         url: '@Url.Action("GetThreshold", "PatientList")',
@@ -495,7 +528,7 @@
         $("td").each(function () {
             /// Checking all systolic values to highlight
             if ($(this).hasClass('systolicValue')) {
-                var row = $(this).closest("tr")[0];               
+                var row = $(this).closest("tr")[0];
                 if (parseFloat(row.cells[4].innerHTML.split()[0]) > systolicValue) {
                     row.cells[4].classList.add("bloodPressureHighlight");
                 }
