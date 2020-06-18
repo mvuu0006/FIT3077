@@ -90,14 +90,14 @@
     <div>
         <div class="row">
             <div class="col-sm">
-                <h4>Monitored Patients</h4>
+                <h4 id="view-name">Monitored Patients</h4>
             </div>
             <div class="col-sm">
                 @*Button to show monitor list in a graph*@
                 <button onclick="location.href='@Url.ActionLink("HistoricalMonitor", "PatientList")'" type="button" class="btn btn-primary float-right">
                     Historical Monitor
                 </button>
-                <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#exampleModal" style="margin-right:10px">Show Graph</button>
+                <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#graphModal" style="margin-right:10px">Show Graph</button>
             </div>
         </div>
     </div>
@@ -192,7 +192,7 @@
     </div>
 
     @*Modal popup to show graph*@
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="graphModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -212,7 +212,7 @@
 
     @*Chart render with Chart.js*@
     <script>
-        $('#exampleModal').on('shown.bs.modal', function (event) {
+        $('#graphModal').on('shown.bs.modal', function (event) {
             var graphLabel = [];
             var graphData = [];
             $('td').each(function () {
@@ -314,157 +314,7 @@
     }
 </style>
 
-
-@*<summary>
-          Function to update all patients' details every interval
-    </summary>*@
-<script type="text/javascript">
-    function Update() {
-        /// ajax request to update patients' details and update view accordingly
-        $.ajax({
-            url: '@Url.Action("ResetMonitorList", "PatientList")',
-            dataType: "json",
-            type: 'POST',
-            traditional: true,
-            success: function (data) {
-                window.location.reload(false);
-            }
-        });
-    }
-</script>
-
-@*<summary>
-          Function to update graph details every interval
-    </summary>*@
-<script type="text/javascript">
-    function UpdateGraph() {
-
-        $.ajax({
-            url: '@Url.Action("ResetMonitorList", "PatientList")',
-            type: 'POST',
-            traditional: true,
-            success: function () {
-                UpdateSuccess();
-            }
-        });
-
-        function UpdateSuccess() {
-
-            $.ajax({
-                url: '@Url.Action("UpdateGraphData", "PatientList")',
-                dataType: "json",
-                data: {},
-                type: 'GET',
-                traditional: true,
-                success: function (result) {
-                    GraphCallback(result);
-                }
-            });
-            function GraphCallback(result) {
-                if (chart.data.datasets.length > 0) {
-                    chart.data.labels = result["labels"];
-                    chart.data.datasets[0].data = result["data"];
-                    chart.update();
-                }
-            }
-        }
-
-    }
-</script>
-
-@*<summary>
-          Function to implement a timer with customizable interval
-    </summary>*@
-<script>
-    function Timer(fn, t) {
-        var timerObj = setInterval(fn, t);
-
-        this.stop = function () {
-            if (timerObj) {
-                clearInterval(timerObj);
-                timerObj = null;
-            }
-            return this;
-        }
-
-        // start timer using current settings (if it's not already running)
-        this.start = function () {
-            if (!timerObj) {
-                this.stop();
-                timerObj = setInterval(fn, t);
-            }
-            return this;
-        }
-
-        // start with new or original interval, stop current interval
-        this.reset = function (newT = t) {
-            t = newT;
-            return this.stop().start();
-        }
-    }
-
-    var countdown;
-
-    /// ajax request to get current interval from AppContext
-    $.ajax({
-        url: '@Url.Action("GetUpdateInterval", "PatientList")',
-        dataType: "json",
-        data: {},
-        traditional: true,
-        success: function (result) {
-            callbackInterval(result);
-        }
-    });
-
-    /// Generate view elements (countdown timer, reset listener) with interval data
-    function callbackInterval(data) {
-        countdown = data;
-        document.getElementById("interval").dataset.content = toString(countdown);
-
-        /// countdown timer to update data
-        var timer = new Timer(function () {
-            document.getElementById("countdownTimer").innerHTML = "Data updates after: " + countdown + " seconds.";
-            document.getElementById("graphTimer").innerHTML = "Data updates after: " + countdown + " seconds.";
-            countdown -= 1;
-            if (countdown < 0) {
-                if ($('#exampleModal').hasClass('show')) {
-                    UpdateGraph();
-                }
-                else {
-                    Update();
-                }
-                countdown = data;
-            }
-        }, 1000);
-        timer.start();
-
-        /// reset timer listener with new interval input
-        document.getElementById("reset").addEventListener("click", function (e) {
-            var newInterval = parseInt(document.getElementById("interval").value);
-
-            /// check for appropiate new update interval
-            if (isNaN(newInterval) || !(Number.isInteger(newInterval)) || (newInterval <= 5)) {
-                alert("Update interval should be an integer greater than 5.");
-            }
-
-            else {
-                /// update new interval to AppContext
-                $.ajax({
-                    url: '@Url.Action("SetUpdateInterval", "PatientList")',
-                    data: { newInterval: document.getElementById("interval").value },
-                    dataType: "json",
-                    type: 'POST',
-                    traditional: true,
-                });
-
-                countdown = newInterval;
-                data = newInterval;
-                document.getElementById("interval").dataset.content = document.getElementById("interval").value;
-                timer.reset(1000);
-            }
-        });
-    }
-</script>
+<script src="~/js/update.js" type="text/javascript"></script>
 
 @*Countdown timer div*@
 <p style="position:relative; top:20px" id="countdownTimer"></p>

@@ -19,6 +19,57 @@
     });
 }
 
+/*
+ Function to update graph details every interval
+ */
+function UpdateGraph(viewName) {
+
+    $.ajax({
+        url: '/PatientList/ResetView/',
+        type: 'POST',
+        traditional: true,
+        success: function () {
+            UpdateSuccess(viewName);
+        }
+    });
+
+    function UpdateSuccess(viewName) {
+
+        $.ajax({
+            url: '/PatientList/UpdateGraphData/',
+            dataType: "json",
+            data: { ViewName: viewName },
+            type: 'GET',
+            traditional: true,
+            success: function (result) {
+                if (viewName === "Monitored Patients") {
+                    CholesterolGraphCallback(result);
+                } else if (viewName === "Historical Monitor") {
+                    BloodPressureGraphCallback(result);
+                }
+            }
+        });
+
+        function CholesterolGraphCallback(result) {
+            if (chart.data.datasets.length > 0) {
+                chart.data.labels = result["labels"];
+                chart.data.datasets[0].data = result["data"];
+                chart.update();
+            }
+        }
+
+        function BloodPressureGraphCallback(result) {
+            for (var i = 0; i < charts.length; i++) {
+                if (chart.data.datasets.length > 0) {
+                    charts[i].data.datasets[0].data = result[i];
+                    charts[i].update();
+                }
+            }
+        }
+    }
+
+}
+
 function Timer(fn, t) {
     var timerObj = setInterval(fn, t);
 
@@ -70,9 +121,15 @@ function callbackInterval(data) {
     /// countdown timer to update data
     var timer = new Timer(function () {
         document.getElementById("countdownTimer").innerHTML = "Data updates after: " + countdown + " seconds.";
+        document.getElementById("graphTimer").innerHTML = "Data updates after: " + countdown + " seconds.";
         countdown -= 1;
         if (countdown < 0) {
-            Update();
+            if ($('#graphModal').hasClass('show')) {
+                UpdateGraph($('#view-name').html());
+            }
+            else {
+                Update();
+            }
             countdown = data;
         }
     }, 1000);
@@ -90,18 +147,19 @@ function callbackInterval(data) {
             }
 
             else {
-                countdown = newInterval;
-                document.getElementById("interval").dataset.content = document.getElementById("interval").value;
-                timer.reset(1000);
-
                 /// update new interval to AppContext
                 $.ajax({
-                    url: 'PatientList/SetUpdateInterval/',
+                    url: '/PatientList/SetUpdateInterval/',
                     data: { newInterval: document.getElementById("interval").value },
                     dataType: "json",
                     type: 'POST',
                     traditional: true
                 });
+
+                countdown = newInterval;
+                data = newInterval;
+                document.getElementById("interval").dataset.content = document.getElementById("interval").value;
+                timer.reset(1000);
             }
         });
     }

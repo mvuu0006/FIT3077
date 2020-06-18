@@ -12,6 +12,8 @@ namespace FIT3077_Pre1975.Controllers
     /// </summary>
     public class PatientListController : Controller
     {
+        private const string MONITOR_VIEW_TITLE = "Monitored Patients";
+        private const string HISTORICAL_VIEW_TITLE = "Historical Monitor";
 
         // GET: /PatientList/
         //
@@ -76,7 +78,8 @@ namespace FIT3077_Pre1975.Controllers
             List<Tracker> trackers = new List<Tracker>();
             foreach (Patient patient in AppContext.MonitorPatients)
             {
-                if (patient.ContainsObservation("Systolic Blood Pressure"))
+                if (patient.ContainsObservation("Systolic Blood Pressure") 
+                    && patient.GetObservationByCodeText("Systolic Blood Pressure").MeasurementResult.Value >= AppContext.SystolicThreshold)
                 {
                     trackers.Add(new Tracker(patient, "Systolic Blood Pressure"));
                 }
@@ -131,22 +134,10 @@ namespace FIT3077_Pre1975.Controllers
             return View("Monitor");
         }
 
-        /// <summary>
-        /// Update the Monitor List after N seconds
-        /// </summary>
-        /// <param name="ListId"> </param>
-        /// <returns> Updated Monitor List </returns>
-        [HttpPost]
-        public async Task<ActionResult> ResetMonitorList()
-        {
-            PatientsList queriedPatients = await FhirService.GetObservationValues(AppContext.MonitorPatients);
-            AppContext.MonitorPatients = queriedPatients;
-            return Json("Success");
-        }
-
         // <summary>
         /// Update the View after N seconds
         /// </summary>
+        [HttpPost]
         public async Task<IActionResult> ResetView()
         {
             PatientsList queriedPatients = await FhirService.GetObservationValues(AppContext.MonitorPatients);
@@ -210,26 +201,50 @@ namespace FIT3077_Pre1975.Controllers
             return Json(AppContext.BPThresholds);
         }
 
-        public JsonResult UpdateGraphData()
+        public JsonResult UpdateGraphData(string ViewName)
         {
-            List<string> labels = new List<string>();
-            List<string> data = new List<string>();
-            
-            foreach (Patient patient in AppContext.MonitorPatients) {
-                if (patient.HasObservations)
-                {
-                    labels.Add(patient.Name);
-                    data.Add(patient.Observations[0].MeasurementResult.Value.ToString());
-                }
-            }
-
-            Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>
+            if (ViewName.Equals(MONITOR_VIEW_TITLE))
             {
-                { "labels", labels },
-                { "data", data }
-            };
+                List<string> labels = new List<string>();
+                List<string> data = new List<string>();
 
-            return Json(dict);
+                foreach (Patient patient in AppContext.MonitorPatients)
+                {
+                    if (patient.ContainsObservation("Total Cholesterol"))
+                    {
+                        labels.Add(patient.Name);
+                        data.Add(patient.GetObservationByCodeText("Total Cholesterol").MeasurementResult.Value.ToString());
+                    }
+                }
+
+                Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>
+                {
+                    { "labels", labels },
+                    { "data", data }
+                };
+
+                return Json(dict);
+            }
+            else if (ViewName.Equals(HISTORICAL_VIEW_TITLE))
+            {
+                List<List<string>> dataList = new List<List<string>>();
+                foreach (Patient patient in AppContext.MonitorPatients)
+                {
+                    if (patient.ContainsObservation("Systolic Blood Pressure")
+                        && patient.GetObservationByCodeText("Systolic Blood Pressure").MeasurementResult.Value >= AppContext.SystolicThreshold)
+                    {
+                        List<string> data = new List<string>();
+                        Tracker currentTracker = new Tracker(patient, "Systolic Blood Pressure");
+                        foreach (decimal dataPoint in currentTracker.GraphData) 
+                        {
+                            data.Add(dataPoint.ToString());
+                        }
+                        dataList.Add(data);
+                    }
+                }
+                return Json(dataList);
+            }
+            return Json("Invalid ViewName ");
         }
     } 
 }
