@@ -47,7 +47,7 @@ namespace FIT3077_Pre1975.Controllers
         /// Get MonitorList table
         /// </summary>
         /// <returns> monitor list view </returns>
-        public ActionResult Monitor()
+        public IActionResult Monitor()
         {
             if (AppContext.Practitioner == null)
             {
@@ -136,11 +136,22 @@ namespace FIT3077_Pre1975.Controllers
         /// </summary>
         /// <param name="ListId"> </param>
         /// <returns> Updated Monitor List </returns>
-        public async Task<ActionResult> ResetMonitorList(List<string> ListId)
+        [HttpPost]
+        public async Task<ActionResult> ResetMonitorList()
         {
             PatientsList queriedPatients = await FhirService.GetObservationValues(AppContext.MonitorPatients);
             AppContext.MonitorPatients = queriedPatients;
-            return View("Monitor");
+            return Redirect("/PatientList/Monitor");
+        }
+
+        // <summary>
+        /// Update the View after N seconds
+        /// </summary>
+        public async Task<IActionResult> ResetView()
+        {
+            PatientsList queriedPatients = await FhirService.GetObservationValues(AppContext.MonitorPatients);
+            AppContext.MonitorPatients = queriedPatients;
+            return Json("Success");
         }
 
         /// <summary>
@@ -158,11 +169,11 @@ namespace FIT3077_Pre1975.Controllers
         /// </summary>
         /// <param name="Id"> Patient Id to be removed </param>
         /// <returns></returns>
-        public EmptyResult RemoveMonitorPatient(string Id)
+        public IActionResult RemoveMonitorPatient(string Id)
         {
             AppContext.MonitorPatients.GetPatientByID(Id).Selected = false;
             AppContext.MonitorPatients.RemovePatientByID(Id);
-            return new EmptyResult();
+            return Json("Success");
         }
 
         /// <summary>
@@ -170,10 +181,11 @@ namespace FIT3077_Pre1975.Controllers
         /// </summary>
         /// <param name="newInterval"> new Interval time</param>
         /// <returns></returns>
-        public EmptyResult SetUpdateInterval(int newInterval)
+        [HttpPost]
+        public IActionResult SetUpdateInterval(int newInterval)
         {
             AppContext.Interval = newInterval;
-            return new EmptyResult();
+            return Json("Success");
         }
 
         /// <summary>
@@ -184,13 +196,13 @@ namespace FIT3077_Pre1975.Controllers
         {
             return Json(AppContext.Interval);
         }
-        public EmptyResult SetThreshold(int newSystolicThreshold, int newDiastolicThreshold)
+        public IActionResult SetThreshold(int newSystolicThreshold, int newDiastolicThreshold)
         {
             AppContext.SystolicThreshold = newSystolicThreshold;
             AppContext.DiastolicThreshold = newDiastolicThreshold;
             AppContext.BPThresholds[0] = newSystolicThreshold;
             AppContext.BPThresholds[1] = newDiastolicThreshold;
-            return new EmptyResult();
+            return Json("Success");
         }
 
         public JsonResult GetThreshold()

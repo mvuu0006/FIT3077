@@ -86,7 +86,7 @@
 </script>
 
 
-<div>
+<div id="monitor-table">
     <div>
         <div class="row">
             <div class="col-sm">
@@ -323,22 +323,15 @@
     </summary>*@
 <script type="text/javascript">
     function Update() {
-        var IdList = [];
-
-        /// get all the patients' IDs
-        $('td').each(function () {
-            if ($(this).hasClass('anchorDetail')) {
-                IdList.push($(this).attr('data-id'));
-            }
-        });
-
         /// ajax request to update patients' details and update view accordingly
         $.ajax({
             url: '@Url.Action("ResetMonitorList", "PatientList")',
-            data: { ListId: IdList },
-            dataType: "json",
+            dataType: "html",
             type: 'POST',
             traditional: true,
+            success: function (data) {
+                window.location.reload(false);
+            }
         });
     }
 </script>
