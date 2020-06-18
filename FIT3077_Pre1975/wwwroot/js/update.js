@@ -1,4 +1,7 @@
-﻿function Update() {
+﻿/*
+ Function to update patients' details
+ */
+function Update() {
     var IdList = [];
 
     /// get all the patients' IDs
@@ -20,10 +23,11 @@
 }
 
 /*
- Function to update graph details every interval
+ Function to update graph details
  */
 function UpdateGraph(viewName) {
 
+    /// ajax call update patient detail
     $.ajax({
         url: '/PatientList/ResetView/',
         type: 'POST',
@@ -33,8 +37,10 @@ function UpdateGraph(viewName) {
         }
     });
 
+    /// function to update graph after update data call is successful
     function UpdateSuccess(viewName) {
 
+        /// ajax call to get new graph data from AppContext
         $.ajax({
             url: '/PatientList/UpdateGraphData/',
             dataType: "json",
@@ -50,6 +56,7 @@ function UpdateGraph(viewName) {
             }
         });
 
+        /// function to update cholesterol graph with new data
         function CholesterolGraphCallback(result) {
             if (chart.data.datasets.length > 0) {
                 chart.data.labels = result["labels"];
@@ -58,6 +65,7 @@ function UpdateGraph(viewName) {
             }
         }
 
+        /// function to update BP graph with new data
         function BloodPressureGraphCallback(result) {
             for (var i = 0; i < charts.length; i++) {
                 if (chart.data.datasets.length > 0) {
@@ -67,9 +75,11 @@ function UpdateGraph(viewName) {
             }
         }
     }
-
 }
 
+/*
+ Function to implement a customizable timer
+ */
 function Timer(fn, t) {
     var timerObj = setInterval(fn, t);
 
@@ -156,6 +166,7 @@ function callbackInterval(data) {
                     traditional: true
                 });
 
+                /// reset the current timer with new data
                 countdown = newInterval;
                 data = newInterval;
                 document.getElementById("interval").dataset.content = document.getElementById("interval").value;
